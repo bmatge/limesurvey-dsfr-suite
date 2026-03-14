@@ -1,0 +1,69 @@
+# =============================================================================
+# LimeSurvey DSFR Suite — Développement local
+# =============================================================================
+#
+# Prérequis : les repos des modules doivent être clonés au même niveau :
+#
+#   ~/GitHub/
+#   ├── limesurvey-dsfr-suite/       ← ce repo
+#   ├── limesurvey-theme-dsfr/       ← git clone https://github.com/bmatge/limesurvey-theme-dsfr.git
+#   ├── limesurvey-email-dsfr/       ← git clone https://github.com/bmatge/limesurvey-email-dsfr.git
+#   └── limesurvey-conversation-albert/  ← git clone https://github.com/bmatge/limesurvey-conversation-albert.git
+#
+# Usage :
+#   docker compose -f docker-compose.dev.yml up -d
+#   → http://localhost:8080 (admin / admin)
+#
+# Les fichiers du thème et des plugins sont montés en direct depuis vos repos
+# locaux : toute modification est visible instantanément (F5).
+# =============================================================================
+
+services:
+  limesurvey:
+    image: martialblog/limesurvey:6-apache
+    container_name: limesurvey-dev
+    restart: unless-stopped
+    environment:
+      - DB_TYPE=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USERNAME=limesurvey
+      - DB_PASSWORD=limesurvey
+      - DB_NAME=limesurvey
+      - ADMIN_USER=admin
+      - ADMIN_PASSWORD=admin
+      - ADMIN_NAME=Administrateur
+      - ADMIN_EMAIL=admin@example.com
+    ports:
+      - "8080:8080"
+    volumes:
+      # --- Modules DSFR (repos locaux montés en direct) ---
+      - ../limesurvey-theme-dsfr:/var/www/html/themes/survey/dsfr
+      - ../limesurvey-email-dsfr:/var/www/html/plugins/DSFRMail
+      - ../limesurvey-conversation-albert:/var/www/html/plugins/ConversationIA
+      # --- Données persistantes ---
+      - limesurvey-upload-dev:/var/www/html/upload
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.0
+    container_name: limesurvey-dev-db
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=limesurvey
+      - MYSQL_USER=limesurvey
+      - MYSQL_PASSWORD=limesurvey
+    volumes:
+      - limesurvey-db-dev:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  limesurvey-db-dev:
+  limesurvey-upload-dev:

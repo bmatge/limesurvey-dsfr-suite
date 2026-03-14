@@ -1,0 +1,9 @@
+[submodule "modules/theme-dsfr"]
+	path = modules/theme-dsfr
+	url = https://github.com/bmatge/limesurvey-theme-dsfr.git
+[submodule "modules/email-dsfr"]
+	path = modules/email-dsfr
+	url = https://github.com/bmatge/limesurvey-email-dsfr.git
+[submodule "modules/conversation-albert"]
+	path = modules/conversation-albert
+	url = https://github.com/bmatge/limesurvey-conversation-albert.git

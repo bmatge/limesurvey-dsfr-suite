@@ -1,0 +1,85 @@
+# =============================================================================
+# LimeSurvey DSFR Suite — Production
+# =============================================================================
+#
+# Ce fichier utilise les submodules git dans modules/ comme source des fichiers.
+# Avant de lancer :
+#   git submodule update --init --recursive
+#
+# Usage :
+#   cp .env.example .env   # puis éditer les valeurs
+#   docker compose up -d
+#
+# Réseau : utilise le réseau externe "ecosystem-network" (Traefik).
+# Adapter les labels Traefik à votre domaine.
+# =============================================================================
+
+services:
+  limesurvey:
+    image: martialblog/limesurvey:6-apache
+    container_name: limesurvey-dsfr
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - DB_TYPE=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+    volumes:
+      # --- Modules DSFR (submodules git) ---
+      - ./modules/theme-dsfr:/var/www/html/themes/survey/dsfr
+      - ./modules/email-dsfr:/var/www/html/plugins/DSFRMail
+      - ./modules/conversation-albert:/var/www/html/plugins/ConversationIA
+      # --- Données persistantes ---
+      - limesurvey-upload:/var/www/html/upload
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - ecosystem-network
+      - internal
+    labels:
+      # --- Traefik : adapter le domaine ci-dessous ---
+      - "traefik.enable=true"
+      # HTTP → HTTPS redirect
+      - "traefik.http.routers.limesurvey-http.rule=Host(`galileo.bercy.matge.com`)"
+      - "traefik.http.routers.limesurvey-http.entrypoints=web"
+      - "traefik.http.routers.limesurvey-http.middlewares=redirect-to-https"
+      # HTTPS
+      - "traefik.http.routers.limesurvey-https.rule=Host(`galileo.bercy.matge.com`)"
+      - "traefik.http.routers.limesurvey-https.entrypoints=websecure"
+      - "traefik.http.routers.limesurvey-https.tls=true"
+      - "traefik.http.routers.limesurvey-https.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.limesurvey-https.tls.options=anssi-strict@file"
+      - "traefik.http.routers.limesurvey-https.middlewares=security-headers@file"
+      # Service
+      - "traefik.http.services.limesurvey.loadbalancer.server.port=8080"
+      # Middleware
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
+
+  db:
+    image: mysql:8.0
+    container_name: limesurvey-db
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - MYSQL_DATABASE=limesurvey
+    volumes:
+      - limesurvey-db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal
+
+volumes:
+  limesurvey-db:
+  limesurvey-upload:
+
+networks:
+  ecosystem-network:
+    external: true
+  internal:
+    driver: bridge
