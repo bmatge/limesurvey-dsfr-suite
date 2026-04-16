@@ -29,7 +29,7 @@ CREATE TABLE `lime_answer_l10ns` (
   `language` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `lime_answer_l10ns_idx` (`aid`,`language`)
-) ENGINE=MyISAM AUTO_INCREMENT=221 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=241 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -59,7 +59,7 @@ CREATE TABLE `lime_answers` (
   PRIMARY KEY (`aid`),
   KEY `lime_answers_idx` (`qid`,`code`,`scale_id`),
   KEY `lime_answers_idx2` (`sortorder`)
-) ENGINE=MyISAM AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=76 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -206,7 +206,7 @@ CREATE TABLE `lime_conditions` (
   PRIMARY KEY (`cid`),
   KEY `lime_conditions_idx` (`qid`),
   KEY `lime_conditions_idx3` (`cqid`)
-) ENGINE=MyISAM AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -378,7 +378,7 @@ CREATE TABLE `lime_group_l10ns` (
   `language` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `lime_idx1_group_ls` (`gid`,`language`)
-) ENGINE=MyISAM AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -406,7 +406,7 @@ CREATE TABLE `lime_groups` (
   `grelevance` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`gid`),
   KEY `lime_idx1_groups` (`sid`)
-) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -763,7 +763,7 @@ CREATE TABLE `lime_permissions` (
   `export_p` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `lime_idx1_permissions` (`entity_id`,`entity`,`permission`,`uid`)
-) ENGINE=MyISAM AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -849,7 +849,7 @@ CREATE TABLE `lime_plugins` (
   `load_error` int DEFAULT '0',
   `load_error_message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -858,7 +858,7 @@ CREATE TABLE `lime_plugins` (
 
 LOCK TABLES `lime_plugins` WRITE;
 /*!40000 ALTER TABLE `lime_plugins` DISABLE KEYS */;
-INSERT INTO `lime_plugins` VALUES (1,'UpdateCheck','core',1,0,'1.0.0',0,NULL),(2,'PasswordRequirement','core',1,0,'1.1.0',0,NULL),(3,'ComfortUpdateChecker','core',1,0,'1.0.0',0,NULL),(4,'Authdb','core',1,0,'1.0.0',0,NULL),(5,'AuthLDAP','core',0,0,'1.0.0',0,NULL),(6,'AuditLog','core',0,0,'1.0.0',0,NULL),(7,'Authwebserver','core',0,0,'1.0.0',0,NULL),(8,'ExportR','core',1,0,'1.0.0',0,NULL),(9,'ExportSTATAxml','core',1,0,'1.0.0',0,NULL),(10,'ExportSPSSsav','core',1,0,'1.0.4',0,NULL),(11,'oldUrlCompat','core',0,0,'1.0.1',0,NULL),(12,'expressionQuestionHelp','core',0,0,'1.0.1',0,NULL),(13,'expressionQuestionForAll','core',0,0,'1.0.1',0,NULL),(14,'expressionFixedDbVar','core',0,0,'1.0.2',0,NULL),(15,'customToken','core',0,0,'1.0.1',0,NULL),(16,'mailSenderToFrom','core',0,0,'1.0.0',0,NULL),(17,'TwoFactorAdminLogin','core',0,0,'1.3.0',0,NULL);
+INSERT INTO `lime_plugins` VALUES (1,'UpdateCheck','core',1,0,'1.0.0',0,NULL),(2,'PasswordRequirement','core',1,0,'1.1.0',0,NULL),(3,'ComfortUpdateChecker','core',1,0,'1.0.0',0,NULL),(4,'Authdb','core',1,0,'1.0.0',0,NULL),(5,'AuthLDAP','core',0,0,'1.0.0',0,NULL),(6,'AuditLog','core',0,0,'1.0.0',0,NULL),(7,'Authwebserver','core',0,0,'1.0.0',0,NULL),(8,'ExportR','core',1,0,'1.0.0',0,NULL),(9,'ExportSTATAxml','core',1,0,'1.0.0',0,NULL),(10,'ExportSPSSsav','core',1,0,'1.0.4',0,NULL),(11,'oldUrlCompat','core',0,0,'1.0.1',0,NULL),(12,'expressionQuestionHelp','core',0,0,'1.0.1',0,NULL),(13,'expressionQuestionForAll','core',0,0,'1.0.1',0,NULL),(14,'expressionFixedDbVar','core',0,0,'1.0.2',0,NULL),(15,'customToken','core',0,0,'1.0.1',0,NULL),(16,'mailSenderToFrom','core',0,0,'1.0.0',0,NULL),(17,'TwoFactorAdminLogin','core',0,0,'1.3.0',0,NULL),(18,'statFunctions','core',1,0,'0.2.1',NULL,NULL);
 /*!40000 ALTER TABLE `lime_plugins` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -878,7 +878,7 @@ CREATE TABLE `lime_question_attributes` (
   PRIMARY KEY (`qaid`),
   KEY `lime_idx1_question_attributes` (`qid`),
   KEY `lime_idx2_question_attributes` (`attribute`)
-) ENGINE=MyISAM AUTO_INCREMENT=2562 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=3248 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -907,7 +907,7 @@ CREATE TABLE `lime_question_l10ns` (
   `language` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `lime_idx1_question_ls` (`qid`,`language`)
-) ENGINE=MyISAM AUTO_INCREMENT=769 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=795 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -997,7 +997,7 @@ CREATE TABLE `lime_questions` (
   KEY `lime_idx3_questions` (`type`),
   KEY `lime_idx4_questions` (`title`),
   KEY `lime_idx5_questions` (`parent_qid`)
-) ENGINE=MyISAM AUTO_INCREMENT=193 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=219 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1198,7 +1198,7 @@ CREATE TABLE `lime_settings_user` (
   KEY `lime_idx2_settings_user` (`entity`),
   KEY `lime_idx3_settings_user` (`entity_id`),
   KEY `lime_idx4_settings_user` (`stg_name`)
-) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1207,7 +1207,7 @@ CREATE TABLE `lime_settings_user` (
 
 LOCK TABLES `lime_settings_user` WRITE;
 /*!40000 ALTER TABLE `lime_settings_user` DISABLE KEYS */;
-INSERT INTO `lime_settings_user` VALUES (1,1,NULL,NULL,'welcome_page_widget','list-widget'),(2,1,NULL,NULL,'last_question','1'),(3,1,NULL,NULL,'last_survey','282267'),(4,1,NULL,NULL,'quickaction_state','1');
+INSERT INTO `lime_settings_user` VALUES (1,1,NULL,NULL,'welcome_page_widget','list-widget'),(5,1,NULL,NULL,'last_survey','282267'),(4,1,NULL,NULL,'quickaction_state','1');
 /*!40000 ALTER TABLE `lime_settings_user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1716,7 +1716,7 @@ CREATE TABLE `lime_surveys` (
 
 LOCK TABLES `lime_surveys` WRITE;
 /*!40000 ALTER TABLE `lime_surveys` DISABLE KEYS */;
-INSERT INTO `lime_surveys` VALUES (282267,1,1,'Amministratore OpenSurvey.it','Y',NULL,NULL,'admin.limesurvey@opensurvey.it','Y','G','N','dsfr','fr','de-informal en it','Y','N','N','N',0,'N','Y','Y','N','N','N','2026-04-16 19:20:37',0,'Y','N','Y','Y','Y','N','N','X','N','admin.limesurvey@opensurvey.it','','','',15,'Y','B','Y','B',0,'N','','','','','','Y','Y',2,0,'N','N','0','','{\"enabled\":\"N\",\"columns\":{\"firstname\":\"N\",\"lastname\":\"N\",\"email\":\"N\"}}','O','2026-04-16 19:22:30');
+INSERT INTO `lime_surveys` VALUES (282267,1,1,'Amministratore OpenSurvey.it','Y',NULL,NULL,'admin.limesurvey@opensurvey.it','Y','G','N','dsfr','fr','de-informal en it','Y','N','N','N',0,'N','Y','Y','N','N','N','2026-04-16 19:20:37',0,'Y','N','Y','Y','Y','N','N','N','N','admin.limesurvey@opensurvey.it','','','',15,'Y','B','Y','B',0,'N','','','','','','Y','Y',2,0,'N','N','0','','{\"enabled\":\"N\",\"columns\":{\"firstname\":\"N\",\"lastname\":\"N\",\"email\":\"N\"}}','O','2026-04-16 19:22:30');
 /*!40000 ALTER TABLE `lime_surveys` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1900,7 +1900,7 @@ CREATE TABLE `lime_template_configuration` (
   KEY `lime_idx2_template_configuration` (`sid`),
   KEY `lime_idx3_template_configuration` (`gsid`),
   KEY `lime_idx4_template_configuration` (`uid`)
-) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1909,7 +1909,7 @@ CREATE TABLE `lime_template_configuration` (
 
 LOCK TABLES `lime_template_configuration` WRITE;
 /*!40000 ALTER TABLE `lime_template_configuration` DISABLE KEYS */;
-INSERT INTO `lime_template_configuration` VALUES (1,'vanilla',NULL,NULL,NULL,'{\"add\":[\"css/base.css\",\"css/theme.css\",\"css/noTablesOnMobile.css\",\"css/custom.css\"]}','{\"add\":[\"scripts/theme.js\",\"scripts/ajaxify.js\",\"scripts/custom.js\"]}','{\"add\":[\"css/print_theme.css\"]}','{\"ajaxmode\":\"off\", \"animatebody\":\"off\", \"fixnumauto\":\"enable\",\"brandlogo\":\"on\",\"container\":\"on\", \"hideprivacyinfo\": \"off\", \"brandlogofile\":\"themes/survey/vanilla/files/logo.png\",\"font\":\"noto\", \"showpopups\":\"1\", \"showclearall\":\"off\", \"questionhelptextposition\":\"top\"}','bootstrap','{}','','{\"add\":[\"pjax\",\"font-noto\",\"moment\"]}',NULL,NULL),(2,'fruity',NULL,NULL,NULL,'{\"add\":[\"css/ajaxify.css\",\"css/animate.css\",\"css/variations/sea_green.css\",\"css/theme.css\",\"css/custom.css\"]}','{\"add\":[\"scripts/theme.js\",\"scripts/ajaxify.js\",\"scripts/custom.js\"]}','{\"add\":[\"css/print_theme.css\"]}','{\"ajaxmode\":\"off\",\"fixnumauto\":\"enable\",\"brandlogo\":\"on\",\"brandlogofile\":\"themes/survey/fruity/files/logo.png\",\"container\":\"on\",\"backgroundimage\":\"off\",\"backgroundimagefile\":null,\"animatebody\":\"off\",\"bodyanimation\":\"fadeInRight\",\"bodyanimationduration\":\"500\",\"animatequestion\":\"off\",\"questionanimation\":\"flipInX\",\"questionanimationduration\":\"500\",\"animatealert\":\"off\",\"alertanimation\":\"shake\",\"alertanimationduration\":\"500\",\"font\":\"noto\",\"bodybackgroundcolor\":\"#ffffff\",\"fontcolor\":\"#444444\",\"questionbackgroundcolor\":\"#ffffff\",\"questionborder\":\"on\",\"questioncontainershadow\":\"on\",\"checkicon\":\"f00c\",\"animatecheckbox\":\"on\",\"checkboxanimation\":\"rubberBand\",\"checkboxanimationduration\":\"500\",\"animateradio\":\"on\",\"radioanimation\":\"zoomIn\",\"radioanimationduration\":\"500\",\"zebrastriping\":\"off\",\"stickymatrixheaders\":\"off\",\"greyoutselected\":\"off\",\"hideprivacyinfo\":\"off\",\"crosshover\":\"off\",\"showpopups\":\"1\", \"showclearall\":\"off\", \"questionhelptextposition\":\"top\",\"notables\":\"1\"}','bootstrap','{}','','{\"add\":[\"pjax\",\"font-noto\",\"moment\"]}',NULL,NULL),(3,'bootswatch',NULL,NULL,NULL,'{\"add\":[\"css/ajaxify.css\",\"css/theme.css\",\"css/custom.css\"]}','{\"add\":[\"scripts/theme.js\",\"scripts/ajaxify.js\",\"scripts/custom.js\"]}','{\"add\":[\"css/print_theme.css\"]}','{\"ajaxmode\":\"off\",\"fixnumauto\":\"enable\",\"brandlogo\":\"on\",\"container\":\"on\",\"brandlogofile\":\"themes/survey/bootswatch/files/logo.png\", \"showpopups\":\"1\", \"showclearall\":\"off\", \"hideprivacyinfo\": \"off\", \"questionhelptextposition\":\"top\"}','bootstrap','{\"replace\":[[\"css/bootstrap.css\",\"css/variations/flatly.min.css\"]]}','','{\"add\":[\"pjax\",\"font-noto\",\"moment\"]}',NULL,NULL),(4,'fruity_twentythree',NULL,NULL,NULL,'{\"add\":[\"css/variations/theme_apple.css\",\"css/base.css\",\"css/custom.css\"], \"remove\":[\"survey.css\", \"template-core.css\", \"awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css\", \"awesome-bootstrap-checkbox/awesome-bootstrap-checkbox-rtl.css\"]}','{\"add\":[\"scripts/theme.js\",\"scripts/custom.js\"], \"remove\":[\"survey.js\", \"template-core.js\"]}','{\"add\":[\"css/print_theme.css\"]}','{\"hideprivacyinfo\":\"off\",\"showpopups\":\"1\",\"showclearall\":\"off\",\"questionhelptextposition\":\"top\",\"fixnumauto\":\"enable\",\"backgroundimage\":\"off\",\"backgroundimagefile\":\".\\/files\\/pattern.png\",\"brandlogo\":\"off\",\"brandlogofile\":\"image::theme::files\\/logo.png\",\"font\":\"ibm-sans\", \"bodybackgroundcolor\":\"#ffffff\",\"fontcolor\":\"#444444\", \"questionbackgroundcolor\":\"#ffffff\", \"checkicon\":\"EB7A\",\"cssframework\":\"Apple\", \"notables\":\"1\"}','','','','{\"add\":[\"pjax\",\"moment\",\"font-ibm-sans\",\"font-ibm-serif\"]}',NULL,NULL),(5,'vanilla',282267,NULL,NULL,'inherit','inherit','inherit','inherit','inherit','inherit','inherit','inherit',NULL,NULL),(6,'fruity_twentythree',282267,NULL,NULL,'inherit','inherit','inherit','inherit','inherit','inherit','inherit','inherit',NULL,NULL),(7,'fruity_twentythree',NULL,1,NULL,'inherit','inherit','inherit','inherit','inherit','inherit','inherit','inherit',NULL,NULL),(8,'dsfr',NULL,NULL,NULL,'{\"replace\":[\"css\\/dsfr-no-datauri.min.css\",\"css\\/icons.min.css\",\"css\\/dsfr-grid-helpers.css\",\"css\\/theme.css\",\"css\\/custom.css\"],\"remove\":[\"template-core.css\",\"awesome-bootstrap-checkbox\\/awesome-bootstrap-checkbox.css\",\"awesome-bootstrap-checkbox\\/awesome-bootstrap-checkbox-rtl.css\"]}','{\"replace\":[\"scripts\\/bootstrap-stubs.js\",\"scripts\\/theme.js\",\"scripts\\/custom.js\"]}','{\"replace\":[\"css\\/print_theme.css\"]}','{\"showclearall\":\"off\",\"fixnumauto\":\"enable\",\"showquestioncode\":\"on\",\"sanitize_rte_content\":\"on\",\"brandlogo\":\"off\",\"brandlogo_sircom_certified\":\"off\",\"brandlogofile\":\".\\/files\\/logo.png\",\"dsfr_theme\":\"light\",\"show_marianne\":\"on\",\"show_footer_links\":\"on\",\"marianne_text\":\"Libert\\u00e9\\n\\u00c9galit\\u00e9\\nFraternit\\u00e9\",\"header_title\":\"Enqu\\u00eates et questionnaires\",\"footer_text\":\"Service de questionnaires en ligne\",\"intellectual_property\":\"Sauf mention explicite de propri\\u00e9t\\u00e9 intellectuelle d\\u00e9tenue par des tiers, les contenus de ce site sont propos\\u00e9s sous licence etalab-2.0\",\"accessibility_content\":\"\",\"editor\":\"\",\"publication_director\":\"\",\"host\":\"\",\"legal_content\":\"\",\"data_controller\":\"\",\"survey_purpose\":\"\",\"data_retention\":\"\",\"contact_email\":\"\",\"privacy_content\":\"\",\"cookies_content\":\"\",\"antibot_enabled\":\"off\",\"antibot_timer\":\"2\",\"antibot_custom_questions\":\"\"}','dsfr','{\"replace\":[[\"css\\/bootstrap.css\",\"css\\/theme.css\"]]}','[]','{\"add\":[\"jquery\",\"pjax\",\"moment\"]}',NULL,NULL),(9,'dsfr',282267,NULL,NULL,'inherit','inherit','inherit','{\"general_inherit\":null,\"font\":\"inherit\",\"brandlogofile\":\"inherit\",\"dsfr_theme\":\"inherit\",\"showclearall\":\"on\",\"fixnumauto\":\"inherit\",\"showquestioncode\":\"on\",\"sanitize_rte_content\":\"on\",\"brandlogo\":\"inherit\",\"brandlogo_sircom_certified\":\"inherit\",\"show_marianne\":\"inherit\",\"show_footer_links\":\"inherit\",\"antibot_enabled\":\"on\",\"marianne_text\":\"R\\u00e9publique<br>Fran\\u00e7aise\",\"header_title\":\"inherit\",\"footer_text\":\"inherit\",\"intellectual_property\":\"inherit\",\"accessibility_content\":\"inherit\",\"editor\":\"inherit\",\"publication_director\":\"inherit\",\"host\":\"inherit\",\"legal_content\":\"inherit\",\"data_controller\":\"inherit\",\"survey_purpose\":\"inherit\",\"data_retention\":\"inherit\",\"contact_email\":\"inherit\",\"privacy_content\":\"inherit\",\"cookies_content\":\"inherit\",\"antibot_timer\":\"inherit\",\"antibot_custom_questions\":\"inherit\",\"generalInherit\":null}','inherit','inherit','inherit','inherit',NULL,NULL),(10,'dsfr',NULL,1,NULL,'inherit','inherit','inherit','inherit','inherit','inherit','inherit','inherit',NULL,NULL);
+INSERT INTO `lime_template_configuration` VALUES (1,'vanilla',NULL,NULL,NULL,'{\"add\":[\"css/base.css\",\"css/theme.css\",\"css/noTablesOnMobile.css\",\"css/custom.css\"]}','{\"add\":[\"scripts/theme.js\",\"scripts/ajaxify.js\",\"scripts/custom.js\"]}','{\"add\":[\"css/print_theme.css\"]}','{\"ajaxmode\":\"off\", \"animatebody\":\"off\", \"fixnumauto\":\"enable\",\"brandlogo\":\"on\",\"container\":\"on\", \"hideprivacyinfo\": \"off\", \"brandlogofile\":\"themes/survey/vanilla/files/logo.png\",\"font\":\"noto\", \"showpopups\":\"1\", \"showclearall\":\"off\", \"questionhelptextposition\":\"top\"}','bootstrap','{}','','{\"add\":[\"pjax\",\"font-noto\",\"moment\"]}',NULL,NULL),(2,'fruity',NULL,NULL,NULL,'{\"add\":[\"css/ajaxify.css\",\"css/animate.css\",\"css/variations/sea_green.css\",\"css/theme.css\",\"css/custom.css\"]}','{\"add\":[\"scripts/theme.js\",\"scripts/ajaxify.js\",\"scripts/custom.js\"]}','{\"add\":[\"css/print_theme.css\"]}','{\"ajaxmode\":\"off\",\"fixnumauto\":\"enable\",\"brandlogo\":\"on\",\"brandlogofile\":\"themes/survey/fruity/files/logo.png\",\"container\":\"on\",\"backgroundimage\":\"off\",\"backgroundimagefile\":null,\"animatebody\":\"off\",\"bodyanimation\":\"fadeInRight\",\"bodyanimationduration\":\"500\",\"animatequestion\":\"off\",\"questionanimation\":\"flipInX\",\"questionanimationduration\":\"500\",\"animatealert\":\"off\",\"alertanimation\":\"shake\",\"alertanimationduration\":\"500\",\"font\":\"noto\",\"bodybackgroundcolor\":\"#ffffff\",\"fontcolor\":\"#444444\",\"questionbackgroundcolor\":\"#ffffff\",\"questionborder\":\"on\",\"questioncontainershadow\":\"on\",\"checkicon\":\"f00c\",\"animatecheckbox\":\"on\",\"checkboxanimation\":\"rubberBand\",\"checkboxanimationduration\":\"500\",\"animateradio\":\"on\",\"radioanimation\":\"zoomIn\",\"radioanimationduration\":\"500\",\"zebrastriping\":\"off\",\"stickymatrixheaders\":\"off\",\"greyoutselected\":\"off\",\"hideprivacyinfo\":\"off\",\"crosshover\":\"off\",\"showpopups\":\"1\", \"showclearall\":\"off\", \"questionhelptextposition\":\"top\",\"notables\":\"1\"}','bootstrap','{}','','{\"add\":[\"pjax\",\"font-noto\",\"moment\"]}',NULL,NULL),(3,'bootswatch',NULL,NULL,NULL,'{\"add\":[\"css/ajaxify.css\",\"css/theme.css\",\"css/custom.css\"]}','{\"add\":[\"scripts/theme.js\",\"scripts/ajaxify.js\",\"scripts/custom.js\"]}','{\"add\":[\"css/print_theme.css\"]}','{\"ajaxmode\":\"off\",\"fixnumauto\":\"enable\",\"brandlogo\":\"on\",\"container\":\"on\",\"brandlogofile\":\"themes/survey/bootswatch/files/logo.png\", \"showpopups\":\"1\", \"showclearall\":\"off\", \"hideprivacyinfo\": \"off\", \"questionhelptextposition\":\"top\"}','bootstrap','{\"replace\":[[\"css/bootstrap.css\",\"css/variations/flatly.min.css\"]]}','','{\"add\":[\"pjax\",\"font-noto\",\"moment\"]}',NULL,NULL),(4,'fruity_twentythree',NULL,NULL,NULL,'{\"add\":[\"css/variations/theme_apple.css\",\"css/base.css\",\"css/custom.css\"], \"remove\":[\"survey.css\", \"template-core.css\", \"awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css\", \"awesome-bootstrap-checkbox/awesome-bootstrap-checkbox-rtl.css\"]}','{\"add\":[\"scripts/theme.js\",\"scripts/custom.js\"], \"remove\":[\"survey.js\", \"template-core.js\"]}','{\"add\":[\"css/print_theme.css\"]}','{\"hideprivacyinfo\":\"off\",\"showpopups\":\"1\",\"showclearall\":\"off\",\"questionhelptextposition\":\"top\",\"fixnumauto\":\"enable\",\"backgroundimage\":\"off\",\"backgroundimagefile\":\".\\/files\\/pattern.png\",\"brandlogo\":\"off\",\"brandlogofile\":\"image::theme::files\\/logo.png\",\"font\":\"ibm-sans\", \"bodybackgroundcolor\":\"#ffffff\",\"fontcolor\":\"#444444\", \"questionbackgroundcolor\":\"#ffffff\", \"checkicon\":\"EB7A\",\"cssframework\":\"Apple\", \"notables\":\"1\"}','','','','{\"add\":[\"pjax\",\"moment\",\"font-ibm-sans\",\"font-ibm-serif\"]}',NULL,NULL),(5,'vanilla',282267,NULL,NULL,'inherit','inherit','inherit','inherit','inherit','inherit','inherit','inherit',NULL,NULL),(6,'fruity_twentythree',282267,NULL,NULL,'inherit','inherit','inherit','inherit','inherit','inherit','inherit','inherit',NULL,NULL),(7,'fruity_twentythree',NULL,1,NULL,'inherit','inherit','inherit','inherit','inherit','inherit','inherit','inherit',NULL,NULL),(8,'dsfr',NULL,NULL,NULL,'{\"replace\":[\"css\\/dsfr-no-datauri.min.css\",\"css\\/icons.min.css\",\"css\\/dsfr-grid-helpers.css\",\"css\\/theme.css\",\"css\\/custom.css\"],\"remove\":[\"template-core.css\",\"awesome-bootstrap-checkbox\\/awesome-bootstrap-checkbox.css\",\"awesome-bootstrap-checkbox\\/awesome-bootstrap-checkbox-rtl.css\"]}','{\"replace\":[\"scripts\\/bootstrap-stubs.js\",\"scripts\\/theme.js\",\"scripts\\/custom.js\"]}','{\"replace\":[\"css\\/print_theme.css\"]}','{\"showclearall\":\"off\",\"fixnumauto\":\"enable\",\"showquestioncode\":\"on\",\"sanitize_rte_content\":\"on\",\"brandlogo\":\"off\",\"brandlogo_sircom_certified\":\"off\",\"brandlogofile\":\".\\/files\\/logo.png\",\"dsfr_theme\":\"light\",\"show_marianne\":\"on\",\"show_footer_links\":\"on\",\"marianne_text\":\"Libert\\u00e9\\n\\u00c9galit\\u00e9\\nFraternit\\u00e9\",\"header_title\":\"Enqu\\u00eates et questionnaires\",\"footer_text\":\"Service de questionnaires en ligne\",\"intellectual_property\":\"Sauf mention explicite de propri\\u00e9t\\u00e9 intellectuelle d\\u00e9tenue par des tiers, les contenus de ce site sont propos\\u00e9s sous licence etalab-2.0\",\"accessibility_content\":\"\",\"editor\":\"\",\"publication_director\":\"\",\"host\":\"\",\"legal_content\":\"\",\"data_controller\":\"\",\"survey_purpose\":\"\",\"data_retention\":\"\",\"contact_email\":\"\",\"privacy_content\":\"\",\"cookies_content\":\"\",\"antibot_enabled\":\"off\",\"antibot_timer\":\"2\",\"antibot_custom_questions\":\"\"}','dsfr','{\"replace\":[[\"css\\/bootstrap.css\",\"css\\/theme.css\"]]}','[]','{\"add\":[\"jquery\",\"pjax\",\"moment\"]}',NULL,NULL),(9,'dsfr',282267,NULL,NULL,'inherit','inherit','inherit','{\"general_inherit\":null,\"font\":\"inherit\",\"brandlogofile\":\"inherit\",\"dsfr_theme\":\"inherit\",\"showclearall\":\"on\",\"fixnumauto\":\"inherit\",\"showquestioncode\":\"on\",\"sanitize_rte_content\":\"on\",\"brandlogo\":\"inherit\",\"brandlogo_sircom_certified\":\"inherit\",\"show_marianne\":\"inherit\",\"show_footer_links\":\"inherit\",\"antibot_enabled\":\"off\",\"marianne_text\":\"R\\u00e9publique<br>Fran\\u00e7aise\",\"header_title\":\"inherit\",\"footer_text\":\"inherit\",\"intellectual_property\":\"inherit\",\"accessibility_content\":\"inherit\",\"editor\":\"inherit\",\"publication_director\":\"inherit\",\"host\":\"inherit\",\"legal_content\":\"inherit\",\"data_controller\":\"inherit\",\"survey_purpose\":\"inherit\",\"data_retention\":\"inherit\",\"contact_email\":\"inherit\",\"privacy_content\":\"inherit\",\"cookies_content\":\"inherit\",\"antibot_timer\":\"inherit\",\"antibot_custom_questions\":\"inherit\",\"generalInherit\":null}','inherit','inherit','inherit','inherit',NULL,NULL),(10,'dsfr',NULL,1,NULL,'inherit','inherit','inherit','inherit','inherit','inherit','inherit','inherit',NULL,NULL),(11,'fruity_twentythree',543686,NULL,NULL,'inherit','inherit','inherit','inherit','inherit','inherit','inherit','inherit',NULL,NULL),(12,'dsfr',543686,NULL,NULL,'inherit','inherit','inherit','inherit','inherit','inherit','inherit','inherit',NULL,NULL),(13,'fruity_twentythree',331981,NULL,NULL,'inherit','inherit','inherit','inherit','inherit','inherit','inherit','inherit',NULL,NULL),(14,'dsfr',331981,NULL,NULL,'inherit','inherit','inherit','inherit','inherit','inherit','inherit','inherit',NULL,NULL),(15,'vanilla',331981,NULL,NULL,'inherit','inherit','inherit','inherit','inherit','inherit','inherit','inherit',NULL,NULL),(16,'vanilla',NULL,1,NULL,'inherit','inherit','inherit','inherit','inherit','inherit','inherit','inherit',NULL,NULL);
 /*!40000 ALTER TABLE `lime_template_configuration` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -2153,7 +2153,7 @@ CREATE TABLE `lime_users` (
 
 LOCK TABLES `lime_users` WRITE;
 /*!40000 ALTER TABLE `lime_users` DISABLE KEYS */;
-INSERT INTO `lime_users` VALUES (1,'admin','$2y$10$/d2LTjqhmbF7GGOB.PY6uu5LWJ.Y7pFNkewocFfZCX3gq1DkjYW4O','Administrateur',0,'auto','admin@example.com','default','default','default',NULL,1,'2026-04-16 19:19:35',NULL,'2026-04-16 19:19:35',NULL,NULL,NULL,NULL,1);
+INSERT INTO `lime_users` VALUES (1,'admin','$2y$10$/d2LTjqhmbF7GGOB.PY6uu5LWJ.Y7pFNkewocFfZCX3gq1DkjYW4O','Administrateur',0,'auto','admin@example.com','default','default','default',NULL,1,'2026-04-16 19:32:42',NULL,'2026-04-16 19:32:42',NULL,NULL,NULL,NULL,1);
 /*!40000 ALTER TABLE `lime_users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -2166,4 +2166,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-04-16 19:27:22
+-- Dump completed on 2026-04-16 22:44:07
