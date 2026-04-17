@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { shouldSkipElement } from '../../modules/theme-dsfr/src/core/dom-utils.js';
+import { shouldSkipElement } from '../../modules/theme-dsfr/src/rte/sanitize.js';
 
 describe('shouldSkipElement', () => {
   it('retourne true pour null', () => {
