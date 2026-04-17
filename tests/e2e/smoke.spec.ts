@@ -1,4 +1,4 @@
-import { test, expect, SURVEY_URL } from './fixtures/survey';
+import { test, expect, SURVEY_URL, fillMandatoryFields } from './fixtures/survey';
 import { S } from './helpers/selectors';
 
 test.describe('Smoke — questionnaire RGAA charge et fonctionne', () => {
@@ -23,25 +23,34 @@ test.describe('Smoke — questionnaire RGAA charge et fonctionne', () => {
     page.on('pageerror', (err) => jsErrors.push(err.message));
 
     await page.goto(SURVEY_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     let pageCount = 0;
     const maxPages = 20;
 
     while (pageCount < maxPages) {
-      // LimeSurvey utilise le même #ls-button-submit pour Next et Submit final.
-      // On distingue par la value : "movenext" = suivant, "movesubmit" = envoyer.
       const nextBtn = page.locator('#ls-button-submit[value="movenext"]');
       const finalSubmitBtn = page.locator('#ls-button-submit[value="movesubmit"]');
 
       if (await finalSubmitBtn.isVisible().catch(() => false)) {
-        // Dernière page atteinte
         break;
       }
 
       if (await nextBtn.isVisible().catch(() => false)) {
+        await fillMandatoryFields(page);
+
+        const prevUrl = page.url();
         await nextBtn.click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
+
+        // Si l'URL n'a pas changé et qu'il y a des erreurs de validation, on est bloqué
+        if (page.url() === prevUrl) {
+          const hasErrors = await page.locator('.question-container.input-error').count();
+          if (hasErrors > 0) {
+            // On ne peut pas avancer, on sort de la boucle
+            break;
+          }
+        }
         pageCount++;
       } else {
         break;

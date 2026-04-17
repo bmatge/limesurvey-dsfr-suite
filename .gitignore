@@ -21,6 +21,7 @@ Thumbs.db
 node_modules/
 playwright-report/
 test-results/
+test-reports/
 
 # Claude Code (instructions locales non partagées)
 CLAUDE.md
