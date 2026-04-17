@@ -1,26 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-
-// --- Reproduire la logique depuis custom.js (lines 2416-2434) ---
-
-function fixDropdownArrayInlineStyles(): void {
-  // Seulement sur mobile (< 768px)
-  if (window.innerWidth >= 768) {
-    return;
-  }
-
-  // Cibler les tableaux dropdown-array
-  const dropdownArrays = document.querySelectorAll('table.dropdown-array');
-
-  dropdownArrays.forEach((table) => {
-    // Trouver tous les td avec style inline contenant display
-    const cells = table.querySelectorAll('tbody tr td[style*="display"]');
-
-    cells.forEach((cell) => {
-      // Supprimer complètement l'attribut style
-      cell.removeAttribute('style');
-    });
-  });
-}
+import { fixDropdownArrayInlineStyles } from '../../modules/theme-dsfr/src/dropdowns/dropdown-array.js';
 
 // --- Tests ---
 

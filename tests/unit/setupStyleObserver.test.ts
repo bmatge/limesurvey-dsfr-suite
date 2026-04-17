@@ -1,65 +1,16 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-
-// --- Reproduire la logique depuis custom.js (lines 2440-2476) ---
-
-let styleObserver: MutationObserver | null = null;
-
-function setupStyleObserver(): void {
-  // Ne surveiller que sur mobile
-  if (window.innerWidth >= 768) {
-    if (styleObserver) {
-      styleObserver.disconnect();
-      styleObserver = null;
-    }
-    return;
-  }
-
-  // Si déjà actif, ne rien faire
-  if (styleObserver) {
-    return;
-  }
-
-  // Créer l'observer
-  styleObserver = new MutationObserver(function (mutations) {
-    mutations.forEach(function (mutation) {
-      if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-        const target = mutation.target as HTMLElement;
-        if (target.tagName === 'TD' && target.closest('table.dropdown-array')) {
-          target.removeAttribute('style');
-        }
-      }
-    });
-  });
-
-  // Observer tous les tableaux dropdown-array
-  const dropdownArrays = document.querySelectorAll('table.dropdown-array');
-  dropdownArrays.forEach(function (table) {
-    styleObserver!.observe(table, {
-      attributes: true,
-      attributeFilter: ['style'],
-      subtree: true,
-    });
-  });
-}
-
-// Reset pour les tests
-function resetObserver(): void {
-  if (styleObserver) {
-    styleObserver.disconnect();
-    styleObserver = null;
-  }
-}
+import { setupStyleObserver, __getStyleObserverForTest, __resetStyleObserverForTest } from '../../modules/theme-dsfr/src/dropdowns/dropdown-array.js';
 
 // --- Tests ---
 
 describe('setupStyleObserver', () => {
   beforeEach(() => {
     document.body.innerHTML = '';
-    resetObserver();
+    __resetStyleObserverForTest();
   });
 
   afterEach(() => {
-    resetObserver();
+    __resetStyleObserverForTest();
     document.body.innerHTML = '';
     vi.restoreAllMocks();
   });
@@ -75,7 +26,7 @@ describe('setupStyleObserver', () => {
 
     setupStyleObserver();
 
-    expect(styleObserver).not.toBeNull();
+    expect(__getStyleObserverForTest()).not.toBeNull();
   });
 
   it('ne crée pas d\'observer sur desktop (>= 768px)', () => {
@@ -89,7 +40,7 @@ describe('setupStyleObserver', () => {
 
     setupStyleObserver();
 
-    expect(styleObserver).toBeNull();
+    expect(__getStyleObserverForTest()).toBeNull();
   });
 
   it('déconnecte l\'observer existant sur desktop', () => {
@@ -103,12 +54,12 @@ describe('setupStyleObserver', () => {
 
     // D'abord créer un observer
     setupStyleObserver();
-    expect(styleObserver).not.toBeNull();
+    expect(__getStyleObserverForTest()).not.toBeNull();
 
     // Puis passer en desktop
     vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(1024);
     setupStyleObserver();
-    expect(styleObserver).toBeNull();
+    expect(__getStyleObserverForTest()).toBeNull();
   });
 
   it('ne recrée pas l\'observer si déjà actif', () => {
@@ -121,10 +72,10 @@ describe('setupStyleObserver', () => {
     `;
 
     setupStyleObserver();
-    const firstObserver = styleObserver;
+    const firstObserver = __getStyleObserverForTest();
     setupStyleObserver();
 
-    expect(styleObserver).toBe(firstObserver);
+    expect(__getStyleObserverForTest()).toBe(firstObserver);
   });
 
   it('ne crée pas d\'observer s\'il n\'y a pas de tableaux dropdown-array', () => {
@@ -135,6 +86,6 @@ describe('setupStyleObserver', () => {
     setupStyleObserver();
 
     // L'observer est créé mais n'observe rien — c'est le comportement réel
-    expect(styleObserver).not.toBeNull();
+    expect(__getStyleObserverForTest()).not.toBeNull();
   });
 });
