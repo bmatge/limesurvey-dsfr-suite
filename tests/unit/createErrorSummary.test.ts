@@ -152,6 +152,46 @@ describe('createErrorSummary', () => {
     expect(item.getAttribute('data-question-id')).toBe('question42');
   });
 
+  it('n\'exécute pas de HTML injecté via le libellé de question (XSS)', () => {
+    // Un admin malveillant peut saisir un payload dans un libellé ; LimeSurvey
+    // peut l'échapper côté serveur, mais textContent le renverrait décodé :
+    // le résumé ne doit jamais le réinterpréter comme HTML.
+    addErrorQuestion(
+      'question1',
+      '<img src=x onerror="window.__xss=1">',
+      '<script>window.__xss=1</script>',
+    );
+
+    createErrorSummary();
+
+    const summary = document.getElementById('dsfr-error-summary')!;
+    expect(summary.querySelector('img')).toBeNull();
+    expect(summary.querySelector('script')).toBeNull();
+    expect((window as unknown as { __xss?: number }).__xss).toBeUndefined();
+
+    const link = summary.querySelector('a')!;
+    expect(link.textContent).toContain('<img src=x onerror="window.__xss=1">');
+  });
+
+  it('échappe l\'id de question utilisé dans href et data-question-id', () => {
+    // Les ids LimeSurvey sont normalement sains, mais on ne se repose pas
+    // dessus : setAttribute doit empêcher une cassure d'attribut.
+    const q = document.createElement('div');
+    q.id = 'q"><img src=x onerror="window.__xssId=1">';
+    q.className = 'question-container input-error';
+    const label = document.createElement('h3');
+    label.className = 'question-text';
+    label.textContent = 'Libellé';
+    q.appendChild(label);
+    document.getElementById('questions')!.appendChild(q);
+
+    createErrorSummary();
+
+    const summary = document.getElementById('dsfr-error-summary')!;
+    expect(summary.querySelector('img')).toBeNull();
+    expect((window as unknown as { __xssId?: number }).__xssId).toBeUndefined();
+  });
+
   it('a les classes DSFR correctes (fr-alert, fr-alert--error)', () => {
     addErrorQuestion('question1', 'Q1', 'Erreur');
 
