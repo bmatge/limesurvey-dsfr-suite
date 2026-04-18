@@ -340,8 +340,15 @@ test.describe('Accessibilite - gestion du focus apres navigation', () => {
     // We should be on a different page
     const urlAfter = page.url();
     if (urlAfter === urlBefore) {
-      // If URL didn't change (validation error), skip this check
-      test.skip();
+      // Saut volontaire : la navigation a échoué (validation serveur bloquante
+      // ou champ particulier non rempli par fillMandatoryFields). Ce test
+      // vérifie spécifiquement qu'après une navigation RÉUSSIE le focus n'est
+      // pas resté sur un élément de la page précédente — il n'a pas de sens
+      // si on est toujours sur la même URL. Pas une régression a11y.
+      test.skip(
+        true,
+        'Skip volontaire : la navigation Suivant a été bloquée (validation serveur) — ce test ne vérifie le transfert de focus qu\'après une navigation effective.',
+      );
       return;
     }
 

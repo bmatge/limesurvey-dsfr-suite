@@ -179,6 +179,60 @@ for suite in d.get('testResults', []):
 " 2>/dev/null || echo "")
 fi
 
+# --- Raisons des skips (Playwright) ---
+# Un skip non expliqué est "confondant" : on lit "1 skipped" sans savoir si
+# c'est voulu ou si un test a été ignoré par erreur. On remonte donc dans
+# le rapport la description des annotations `{type: 'skip'}` (posées via
+# `test.skip(true, "raison...")` dans les spécifications) et à défaut le
+# titre du test.
+PW_SKIPS_HTML=""
+PW_SKIPS_TERM=""
+build_pw_skips() {
+  local json_file="$1"
+  [ -f "$json_file" ] || return 0
+  python3 -c "
+import json
+d = json.load(open('${json_file}'))
+def walk(node, out):
+    for s in node.get('specs', []):
+        for t in s.get('tests', []):
+            skipped = t.get('status') == 'skipped' or any(r.get('status') == 'skipped' for r in t.get('results', []))
+            if not skipped:
+                continue
+            reason = ''
+            for ann in s.get('annotations', []) + t.get('annotations', []):
+                if ann.get('type') == 'skip' and ann.get('description'):
+                    reason = ann['description']
+                    break
+            out.append((s.get('title', '?'), reason))
+    for child in node.get('suites', []):
+        walk(child, out)
+skips = []
+for suite in d.get('suites', []):
+    walk(suite, skips)
+for title, reason in skips:
+    print(f'{title}\t{reason}')
+" 2>/dev/null || true
+}
+# Construit HTML + terminal (une ligne par skip)
+emit_skip_rows() {
+  local json_file="$1"
+  while IFS=$'\t' read -r title reason; do
+    [ -z "$title" ] && continue
+    [ -z "$reason" ] && reason="(sans raison documentée — à annoter dans le spec)"
+    # HTML
+    PW_SKIPS_HTML+="<tr><td>⏭</td><td>${title}</td><td>${reason}</td></tr>"
+    # Terminal
+    PW_SKIPS_TERM+="  ⏭  ${title}\n     → ${reason}\n"
+  done < <(build_pw_skips "$json_file")
+}
+if [ "$RUN_E2E_CLASSIC" = "1" ]; then
+  emit_skip_rows "$E2E_JSON"
+fi
+if [ "$RUN_E2E_RESULTS" = "1" ]; then
+  emit_skip_rows "$RESULTS_JSON"
+fi
+
 # --- Détails par fichier Playwright (fusion classique + results) ---
 PW_DETAILS=""
 build_pw_details() {
@@ -248,6 +302,9 @@ fi
 PW_SECTION=""
 if [ "$RUN_E2E_CLASSIC" = "1" ] || [ "$RUN_E2E_RESULTS" = "1" ]; then
   PW_SECTION="<h2>Détail — Playwright</h2><table><thead><tr><th></th><th>Fichier</th><th>Pass</th><th>Fail</th><th>Total</th></tr></thead><tbody>${PW_DETAILS}</tbody></table>"
+  if [ -n "$PW_SKIPS_HTML" ]; then
+    PW_SECTION+="<h2>Tests volontairement skippés</h2><p class=\"meta\">Skip conditionnel documenté dans le spec — voir colonne « Raison ». Pas une régression.</p><table><thead><tr><th></th><th>Test</th><th>Raison</th></tr></thead><tbody>${PW_SKIPS_HTML}</tbody></table>"
+  fi
 fi
 
 LINKS_HTML=""
@@ -326,6 +383,13 @@ echo ""
 [ "$RUN_E2E_CLASSIC" = "1" ]  && echo -e "  Playwright classique : ${E2E_PASSED}/${E2E_TOTAL} pass  (${E2E_DURATION}s)"
 [ "$RUN_E2E_RESULTS" = "1" ]  && echo -e "  Suite results        : ${RESULTS_PASSED}/${RESULTS_TOTAL} pass  (${RESULTS_DURATION}s)"
 echo ""
+
+# Détail des skips Playwright avec raison — évite la confusion "1 skipped"
+# sans savoir si c'est volontaire ou une régression silencieuse.
+if [ -n "$PW_SKIPS_TERM" ]; then
+  echo -e "${YELLOW}  Tests volontairement skippés (skip documenté) :${NC}"
+  echo -e "${PW_SKIPS_TERM}"
+fi
 if [ "$UNIT_OK" = "1" ] && [ "$E2E_OK" = "1" ] && [ "$RESULTS_OK" = "1" ]; then
   echo -e "  ${GREEN}${BOLD}✅ VERDICT : PASS${NC}"
 else
