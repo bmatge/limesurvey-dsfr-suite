@@ -9,11 +9,16 @@
     "test:a11y": "npx playwright test tests/a11y/",
     "test:smoke": "npx playwright test tests/e2e/smoke.spec.ts",
     "test:report": "npx playwright test && echo '\n📁 Rapport enregistré dans test-reports/'",
-    "test": "vitest run && npx playwright test"
+    "test": "vitest run && npx playwright test",
+    "build:theme": "node modules/theme-dsfr/esbuild.config.mjs",
+    "build:theme:watch": "node modules/theme-dsfr/esbuild.config.mjs --watch",
+    "build:theme:check": "node modules/theme-dsfr/esbuild.config.mjs && git -C modules/theme-dsfr diff --exit-code scripts/custom.js",
+    "dev:purge-cache": "docker exec limesurvey-dev sh -c 'rm -rf /var/www/html/tmp/assets/*' && echo 'Cache Yii purgé — rechargez la page dans le navigateur'"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.0",
     "@playwright/test": "^1.59.0",
+    "esbuild": "^0.28.0",
     "jsdom": "^26.0.0",
     "vitest": "^3.1.0"
   }

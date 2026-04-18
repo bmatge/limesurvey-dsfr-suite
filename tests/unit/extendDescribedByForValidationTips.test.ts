@@ -1,31 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-
-// --- Reproduire la logique depuis custom.js (lines 2980-3001) ---
-
-function extendDescribedByForValidationTips(): void {
-  const tips = document.querySelectorAll('.ls-questionhelp[id^="vmsg_"]');
-  tips.forEach(function (tip) {
-    if ((tip as HTMLElement).dataset.describedbyWired === '1') return;
-
-    const question = tip.closest('[id^="question"]');
-    if (!question) return;
-
-    const fields = question.querySelectorAll('input, textarea, select');
-    fields.forEach(function (field) {
-      if ((field as HTMLInputElement).type === 'hidden') return;
-      const existing = field.getAttribute('aria-describedby') || '';
-      const ids = existing.split(/\s+/).filter(Boolean);
-      if (ids.indexOf(tip.id) === -1) {
-        ids.push(tip.id);
-        field.setAttribute('aria-describedby', ids.join(' '));
-      }
-    });
-
-    (tip as HTMLElement).dataset.describedbyWired = '1';
-  });
-}
-
-// --- Tests ---
+import { extendDescribedByForValidationTips } from '../../modules/theme-dsfr/src/validation/described-by.js';
 
 describe('extendDescribedByForValidationTips', () => {
   beforeEach(() => {

@@ -1,37 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-
-// --- Reproduire la logique de tMandatory depuis custom.js (lines 907-933) ---
-
-const MANDATORY_I18N_FR = {
-  fields_remaining_plural: 'Veuillez compléter les %remaining% champs restants sur %total%.',
-  fields_remaining_singular: 'Veuillez compléter le dernier champ.',
-  fields_all_required: 'Veuillez compléter tous les champs (%total% champs requis).',
-  field_valid: 'Saisie valide',
-  numeric_only: "Ce champ n'accepte que des valeurs numériques.",
-};
-
-const MANDATORY_I18N_EN = {
-  fields_remaining_plural: 'Please complete the remaining %remaining% of %total% fields.',
-  fields_remaining_singular: 'Please complete the last field.',
-  fields_all_required: 'Please complete all fields (%total% fields required).',
-  field_valid: 'Valid input',
-  numeric_only: 'This field only accepts numeric values.',
-};
-
-function tMandatory(key: string, remaining?: number, total?: number): string {
-  const lang = (document.documentElement.lang || 'fr').toLowerCase().substring(0, 2);
-  const dict = lang === 'en' ? MANDATORY_I18N_EN : MANDATORY_I18N_FR;
-  let str = (dict as any)[key] || (MANDATORY_I18N_FR as any)[key] || key;
-  if (typeof remaining !== 'undefined') {
-    str = str.replace('%remaining%', String(remaining));
-  }
-  if (typeof total !== 'undefined') {
-    str = str.replace('%total%', String(total));
-  }
-  return str;
-}
-
-// --- Tests ---
+import { tMandatory } from '../../modules/theme-dsfr/src/core/i18n.js';
 
 describe('tMandatory', () => {
   beforeEach(() => {

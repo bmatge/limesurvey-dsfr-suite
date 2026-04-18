@@ -1,18 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-
-// --- Reproduire la logique de findQuestionByCode depuis custom.js (lines 2551-2561) ---
-
-function findQuestionByCode(questionCode: string): Element | null {
-  // Chercher par attribut data-qcode ou id contenant le code
-  let question = document.querySelector(`[data-qcode="${questionCode}"]`);
-
-  if (!question) {
-    // Chercher dans les IDs des questions (format: question + code)
-    question = document.querySelector(`[id*="${questionCode}"]`);
-  }
-
-  return question;
-}
+import { findQuestionByCode } from '../../modules/theme-dsfr/src/a11y/conditional-aria.js';
 
 // --- Tests ---
 

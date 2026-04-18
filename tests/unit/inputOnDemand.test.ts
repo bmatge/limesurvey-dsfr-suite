@@ -1,36 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-
-// --- Reproduire les fonctions depuis custom.js (lines 70-101) ---
-
-function restoreVisibleLines(): void {
-  const containers = document.querySelectorAll('[id^="selector--inputondemand-"]');
-
-  containers.forEach((container) => {
-    const itemsList = container.querySelector('.selector--inputondemand-list');
-    if (!itemsList) return;
-
-    const allItems = itemsList.querySelectorAll('.selector--inputondemand-list-item');
-    const hiddenItems = itemsList.querySelectorAll('.selector--inputondemand-list-item.d-none');
-
-    if (hiddenItems.length === allItems.length && allItems.length > 0) {
-      allItems[0].classList.remove('d-none');
-    }
-  });
-}
-
-function updateAddButtonVisibility(): void {
-  const containers = document.querySelectorAll('[id^="selector--inputondemand-"]');
-
-  containers.forEach((container) => {
-    const button = container.querySelector('.selector--inputondemand-addlinebutton') as HTMLElement;
-    const itemsList = container.querySelector('.selector--inputondemand-list');
-
-    if (!button || !itemsList) return;
-
-    const hiddenItems = itemsList.querySelectorAll('.selector--inputondemand-list-item.d-none');
-    button.style.display = hiddenItems.length > 0 ? '' : 'none';
-  });
-}
+import { restoreVisibleLines, updateAddButtonVisibility } from '../../modules/theme-dsfr/src/inputs/input-on-demand.js';
 
 // --- Helpers ---
 

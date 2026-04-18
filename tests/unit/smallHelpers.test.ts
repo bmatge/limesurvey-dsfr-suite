@@ -1,18 +1,12 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { isQuestionHidden } from '../../modules/theme-dsfr/src/core/dom-utils.js';
+import { initRadioOtherField } from '../../modules/theme-dsfr/src/inputs/radio-buttons.js';
 
-// ── isQuestionHidden (custom.js line 2807) ──────────────────────────────────
-
-function isQuestionHidden(el: HTMLElement): boolean {
-  return (
-    el.style.display === 'none' ||
-    el.classList.contains('ls-irrelevant') ||
-    el.classList.contains('ls-hidden') ||
-    el.classList.contains('d-none')
-  );
-}
-
-// ── initBootstrapButtonsRadio (custom.js line 127) ──────────────────────────
-// On teste l'effet d'initialisation (pas les event listeners)
+// initBootstrapButtonsRadio_initState teste l'effet d'initialisation (pas les
+// event listeners). La fonction réelle initBootstrapButtonsRadio attache en
+// plus des event listeners change — non testables ici. On garde donc une copie
+// de la sous-logique état initial seulement. Non-régression des listeners
+// couverte par tests/e2e/question-types.spec.ts.
 
 function initBootstrapButtonsRadio_initState(): void {
   const radioGroups = document.querySelectorAll('.radio-list[data-bs-toggle="buttons"]');
@@ -24,26 +18,6 @@ function initBootstrapButtonsRadio_initState(): void {
         if (container) container.classList.add('active');
       }
     });
-  });
-}
-
-// ── initRadioOtherField (custom.js line 169) ────────────────────────────────
-
-function initRadioOtherField(): void {
-  const otherRadios = document.querySelectorAll('input[type="radio"][value="-oth-"]');
-  otherRadios.forEach(function (radio) {
-    const name = (radio as HTMLInputElement).name;
-    const otherDiv = document.getElementById('div' + name + 'other');
-    const otherInput = document.getElementById('answer' + name + 'othertext') as HTMLInputElement | null;
-    const hiddenInput = document.getElementById('answer' + name + 'othertextaux') as HTMLInputElement | null;
-    if (!otherDiv || !otherInput) return;
-
-    if ((radio as HTMLInputElement).checked) {
-      otherDiv.classList.remove('ls-js-hidden');
-      if (hiddenInput && hiddenInput.value) {
-        otherInput.value = hiddenInput.value;
-      }
-    }
   });
 }
 

@@ -1,32 +1,5 @@
 import { describe, it, expect } from 'vitest';
-
-// --- Reproduire la logique de shouldSkipElement depuis custom.js (lines 3922-3942) ---
-
-function shouldSkipElement(element: Element | null): boolean {
-  if (!element) return true;
-
-  // Exclure les astérisques des questions obligatoires
-  if (
-    element.classList &&
-    (element.classList.contains('required-asterisk') ||
-      element.classList.contains('asterisk'))
-  )
-    return true;
-
-  // Exclure les images
-  if (element.tagName === 'IMG') return true;
-
-  // Exclure les éléments contenant des images
-  if (element.querySelector && element.querySelector('img')) return true;
-
-  // Exclure les éléments liés aux fichiers/upload
-  if (element.closest && element.closest('[class*="upload"]')) return true;
-  if (element.closest && element.closest('[class*="file"]')) return true;
-
-  return false;
-}
-
-// --- Tests ---
+import { shouldSkipElement } from '../../modules/theme-dsfr/src/rte/sanitize.js';
 
 describe('shouldSkipElement', () => {
   it('retourne true pour null', () => {

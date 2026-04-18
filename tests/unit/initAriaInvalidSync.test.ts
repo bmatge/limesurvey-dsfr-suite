@@ -1,31 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-
-// --- Reproduire la logique syncAllErrorFields de initAriaInvalidSync (lines 1152-1175) ---
-// On teste la logique de synchronisation, pas le MutationObserver.
-
-function syncAriaInvalidInContainer(container: Element, hasError: boolean): void {
-  const fields = container.querySelectorAll('input, textarea, select');
-  fields.forEach(function (field) {
-    if ((field as HTMLInputElement).type === 'hidden') return;
-    if (field.id && field.id.indexOf('java') === 0) return;
-    if (hasError) {
-      field.setAttribute('aria-invalid', 'true');
-    } else {
-      field.removeAttribute('aria-invalid');
-    }
-  });
-}
-
-function syncAllErrorFields(): void {
-  // Champs individuels en erreur
-  document.querySelectorAll('.fr-input--error, input.error, textarea.error, select.error').forEach((input) => {
-    input.setAttribute('aria-invalid', 'true');
-  });
-  // Conteneurs en erreur
-  document.querySelectorAll('.question-container.input-error, .fr-input-group--error').forEach((container) => {
-    syncAriaInvalidInContainer(container, true);
-  });
-}
+import { syncAriaInvalidInContainer, syncAllErrorFields } from '../../modules/theme-dsfr/src/validation/aria-invalid-sync.js';
 
 // --- Tests ---
 

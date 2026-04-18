@@ -1,26 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
-
-// --- Reproduire la logique de getQuestionText depuis custom.js (lines 2569-2587) ---
-
-function getQuestionText(questionElement: HTMLElement): string {
-  // Chercher le titre de la question (h3 avec id ls-question-text-*)
-  const questionTitle = questionElement.querySelector('[id^="ls-question-text-"]');
-
-  if (questionTitle) {
-    // Nettoyer le texte (enlever les balises HTML, garder seulement le texte)
-    const text = questionTitle.textContent!.trim();
-    // Limiter à 50 caractères pour ne pas surcharger
-    return text.length > 50 ? text.substring(0, 50) + '...' : text;
-  }
-
-  // Sinon, chercher le numéro de question
-  const questionNumber = questionElement.querySelector('.fr-text--xs');
-  if (questionNumber) {
-    return questionNumber.textContent!.trim();
-  }
-
-  return 'la question précédente';
-}
+import { getQuestionText } from '../../modules/theme-dsfr/src/a11y/conditional-aria.js';
 
 // --- Tests ---
 

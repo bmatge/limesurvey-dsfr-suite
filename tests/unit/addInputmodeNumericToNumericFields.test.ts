@@ -1,19 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-
-// --- Reproduire la logique depuis custom.js (lines 3043-3052) ---
-
-function addInputmodeNumericToNumericFields(): void {
-  const numericInputs = document.querySelectorAll('input[data-number="1"]');
-  numericInputs.forEach(function (input) {
-    if ((input as HTMLElement).dataset.inputmodeWired === '1') return;
-    if (!input.hasAttribute('inputmode')) {
-      input.setAttribute('inputmode', 'numeric');
-    }
-    (input as HTMLElement).dataset.inputmodeWired = '1';
-  });
-}
-
-// --- Tests ---
+import { addInputmodeNumericToNumericFields } from '../../modules/theme-dsfr/src/inputs/numeric-inputmode.js';
 
 describe('addInputmodeNumericToNumericFields', () => {
   beforeEach(() => {

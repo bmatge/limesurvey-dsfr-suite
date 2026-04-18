@@ -119,6 +119,114 @@ test.describe('Responsive — mise en page adaptative DSFR', () => {
         }
       }
     });
+
+    test('chaque cellule de tableau linéarisé a un label VISIBLE associé au radio/input', async ({ page }) => {
+      // Régression : un commit antérieur avait retiré les <label class="fr-sr-only">
+      // des cellules pour simplifier l'a11y SR, mais ces labels étaient aussi ce
+      // que le CSS @media mobile révélait — sans eux, les tableaux linéarisés sur
+      // mobile affichaient des radios sans aucun texte à côté.
+      await page.setViewportSize(MOBILE);
+      await goToPage(page, 4);
+
+      const tables = page.locator(S.arrayTable);
+      await expect(tables.first()).toBeVisible({ timeout: 10_000 });
+
+      // Pour chaque input dans une cellule answer-item, on vérifie qu'un <label>
+      // dans la même cellule est effectivement rendu visible (non masqué par
+      // position:absolute / display:none).
+      const missing = await page.evaluate(() => {
+        const result: { input: string; reason: string }[] = [];
+        const cells = document.querySelectorAll(
+          '.ls-answers td.answer-item.radio-item, .ls-answers td.answer-item.text-item, .ls-answers td.answer-item.select-item, .ls-answers td[class*="answer_cell_"]',
+        );
+        cells.forEach((cell) => {
+          const input = cell.querySelector('input[type="radio"], input[type="checkbox"], input[type="text"], input[type="number"], select');
+          if (!input) return;
+          const cellVisible = (cell as HTMLElement).offsetParent !== null;
+          if (!cellVisible) return;
+          const label = cell.querySelector('label');
+          const inputId = (input as HTMLInputElement).id || (input as HTMLInputElement).name;
+          if (!label) {
+            result.push({ input: inputId, reason: 'aucun <label> dans la cellule' });
+            return;
+          }
+          const text = (label.textContent || '').trim();
+          if (!text) {
+            result.push({ input: inputId, reason: 'label présent mais textContent vide' });
+            return;
+          }
+          const cs = window.getComputedStyle(label);
+          // En mode linéarisé (mobile <768px) la règle CSS doit rendre le label
+          // inline-block et non positionné en absolute hors viewport.
+          const hiddenOffscreen = cs.position === 'absolute' && parseInt(cs.left) < -1000;
+          const hiddenDisplay = cs.display === 'none' || cs.visibility === 'hidden';
+          if (hiddenOffscreen || hiddenDisplay) {
+            result.push({ input: inputId, reason: `label masqué (position=${cs.position} left=${cs.left} display=${cs.display})` });
+          }
+        });
+        return result;
+      });
+
+      expect(missing, `${missing.length} cellule(s) de tableau sans label visible sur mobile :\n` +
+        missing.map((m) => `  - ${m.input} : ${m.reason}`).join('\n')).toEqual([]);
+    });
+
+    test('tableau double échelle : séparateurs "Échelle 1" / "Échelle 2" visibles entre les groupes', async ({ page }) => {
+      // Régression : sur mobile le <thead> est masqué (CSS display:none), donc
+      // les libellés de groupe Scale A / Scale B qui y vivent n'étaient plus
+      // visibles — l'utilisateur ne distinguait pas les options d'une échelle
+      // des options de l'autre.
+      await page.setViewportSize(MOBILE);
+      await goToPage(page, 4);
+
+      const check = await page.evaluate(() => {
+        // Cherche la question dual scale (type 1, classe contient "array-dualscale" ou similaire)
+        const dual = Array.from(document.querySelectorAll('.question-container')).find((q) => {
+          const t = q.querySelector('h3')?.textContent || '';
+          return /double.?(échelle|scale)/i.test(t);
+        });
+        if (!dual) return { found: false };
+        const headers = dual.querySelectorAll('.dualscale-scale-header');
+        const visible = Array.from(headers).filter((h) => {
+          const cs = window.getComputedStyle(h as HTMLElement);
+          return cs.display !== 'none' && (h.textContent || '').trim().length > 0;
+        });
+        return {
+          found: true,
+          total: headers.length,
+          visible: visible.length,
+          texts: visible.map((h) => (h.textContent || '').trim()),
+        };
+      });
+
+      expect(check.found, 'aucune question de type Tableau double échelle trouvée sur cette page').toBe(true);
+      expect(check.visible, `séparateurs dualscale attendus ≥ 2 (un par échelle par sous-question), trouvé ${check.visible}`).toBeGreaterThanOrEqual(2);
+    });
+
+    test('chaque label de cellule est lié à son input via for/id (et donc cliquable)', async ({ page }) => {
+      await page.setViewportSize(MOBILE);
+      await goToPage(page, 4);
+
+      const tables = page.locator(S.arrayTable);
+      await expect(tables.first()).toBeVisible({ timeout: 10_000 });
+
+      const orphans = await page.evaluate(() => {
+        const result: string[] = [];
+        const cells = document.querySelectorAll('.ls-answers td.answer-item');
+        cells.forEach((cell) => {
+          const label = cell.querySelector('label[for]');
+          if (!label) return;
+          const forId = label.getAttribute('for');
+          if (!forId) return;
+          if (!document.getElementById(forId)) {
+            result.push(`<label for="${forId}"> pointe vers un id inexistant`);
+          }
+        });
+        return result;
+      });
+
+      expect(orphans).toEqual([]);
+    });
   });
 
   test.describe('Tablet viewport — mise en page équilibrée (768×1024)', () => {

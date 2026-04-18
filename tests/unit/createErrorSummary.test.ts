@@ -1,70 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { createErrorSummary } from '../../modules/theme-dsfr/src/validation/error-summary.js';
 
-// --- Reproduire la logique depuis custom.js (lines 1269-1391, sans scrollIntoView/focus) ---
-
-function createErrorSummary(): void {
-  // Supprimer l'ancien récapitulatif s'il existe
-  const oldSummary = document.getElementById('dsfr-error-summary');
-  if (oldSummary) oldSummary.remove();
-
-  // Trouver toutes les questions en erreur
-  const errorQuestions = document.querySelectorAll(
-    '.question-container.input-error, .question-container.fr-input-group--error'
-  );
-
-  if (errorQuestions.length === 0) return;
-
-  // Construire la liste des erreurs
-  const errorList: { id: string; label: string }[] = [];
-  errorQuestions.forEach(function (question) {
-    const questionId = question.id;
-
-    const questionTextElement = question.querySelector('.ls-label-question, .question-text');
-    let questionText = questionTextElement ? questionTextElement.textContent!.trim() : 'Question sans titre';
-
-    const errorMessageElement = question.querySelector('.fr-message--error');
-    let errorMessage = errorMessageElement ? errorMessageElement.textContent!.trim() : '';
-
-    let label = questionText;
-    if (errorMessage) {
-      label += ' : ' + errorMessage;
-    }
-
-    if (label.length > 150) {
-      label = label.substring(0, 147) + '...';
-    }
-
-    errorList.push({ id: questionId, label: label });
-  });
-
-  // Créer l'alerte DSFR
-  const summary = document.createElement('div');
-  summary.id = 'dsfr-error-summary';
-  summary.className = 'fr-alert fr-alert--error fr-mb-4w';
-  summary.setAttribute('role', 'alert');
-  summary.setAttribute('tabindex', '-1');
-
-  let html = '<h3 class="fr-alert__title">';
-  html += errorList.length === 1 ? 'Une erreur a été détectée' : errorList.length + ' erreurs ont été détectées';
-  html += '</h3>';
-  html += '<p>Veuillez corriger les erreurs suivantes :</p>';
-  html += '<ul class="fr-mb-0">';
-
-  errorList.forEach(function (error) {
-    html += '<li class="error-item" data-question-id="' + error.id + '">';
-    html += '<a href="#' + error.id + '" class="fr-link fr-icon-error-warning-line fr-link--icon-left">' + error.label + '</a>';
-    html += '</li>';
-  });
-
-  html += '</ul>';
-  summary.innerHTML = html;
-
-  // Insérer avant la première question
-  const firstQuestion = document.querySelector('.question-container');
-  if (firstQuestion && firstQuestion.parentNode) {
-    firstQuestion.parentNode.insertBefore(summary, firstQuestion);
-  }
-}
+// jsdom n'implémente pas scrollIntoView — stub global pour que les setTimeout
+// déclenchés par createErrorSummary (scroll + focus) ne plantent pas après coup.
+(Element.prototype as unknown as { scrollIntoView: () => void }).scrollIntoView = () => {};
 
 // --- Helpers ---
 
@@ -110,16 +49,16 @@ describe('createErrorSummary', () => {
     expect(summary.getAttribute('tabindex')).toBe('-1');
   });
 
-  it('affiche "Une erreur a été détectée" pour 1 erreur', () => {
+  it('affiche "Une erreur à corriger" pour 1 erreur', () => {
     addErrorQuestion('question1', 'Votre nom', 'Obligatoire');
 
     createErrorSummary();
 
     const title = document.querySelector('.fr-alert__title')!;
-    expect(title.textContent).toBe('Une erreur a été détectée');
+    expect(title.textContent).toBe('Une erreur à corriger');
   });
 
-  it('affiche "N erreurs ont été détectées" pour plusieurs erreurs', () => {
+  it('affiche "N erreurs à corriger" pour plusieurs erreurs', () => {
     addErrorQuestion('question1', 'Nom', 'Obligatoire');
     addErrorQuestion('question2', 'Prénom', 'Obligatoire');
     addErrorQuestion('question3', 'Email', 'Format invalide');
@@ -127,7 +66,7 @@ describe('createErrorSummary', () => {
     createErrorSummary();
 
     const title = document.querySelector('.fr-alert__title')!;
-    expect(title.textContent).toBe('3 erreurs ont été détectées');
+    expect(title.textContent).toBe('3 erreurs à corriger');
   });
 
   it('crée un lien par question en erreur avec href="#questionId"', () => {
@@ -174,14 +113,17 @@ describe('createErrorSummary', () => {
     expect(link.textContent!.endsWith('...')).toBe(true);
   });
 
-  it('est inséré avant la première question', () => {
+  it('est inséré avant la première question (avec la région status juste après)', () => {
     addErrorQuestion('question1', 'Q1', 'Erreur');
 
     createErrorSummary();
 
     const summary = document.getElementById('dsfr-error-summary')!;
+    const status = document.getElementById('dsfr-error-status')!;
     const firstQuestion = document.querySelector('.question-container')!;
-    expect(summary.nextElementSibling).toBe(firstQuestion);
+    // Le résumé précède la région status, qui précède la 1re question.
+    expect(summary.nextElementSibling).toBe(status);
+    expect(status.nextElementSibling).toBe(firstQuestion);
   });
 
   it('remplace l\'ancien résumé s\'il existe', () => {
@@ -211,6 +153,46 @@ describe('createErrorSummary', () => {
 
     const item = document.querySelector('.error-item')!;
     expect(item.getAttribute('data-question-id')).toBe('question42');
+  });
+
+  it('n\'exécute pas de HTML injecté via le libellé de question (XSS)', () => {
+    // Un admin malveillant peut saisir un payload dans un libellé ; LimeSurvey
+    // peut l'échapper côté serveur, mais textContent le renverrait décodé :
+    // le résumé ne doit jamais le réinterpréter comme HTML.
+    addErrorQuestion(
+      'question1',
+      '<img src=x onerror="window.__xss=1">',
+      '<script>window.__xss=1</script>',
+    );
+
+    createErrorSummary();
+
+    const summary = document.getElementById('dsfr-error-summary')!;
+    expect(summary.querySelector('img')).toBeNull();
+    expect(summary.querySelector('script')).toBeNull();
+    expect((window as unknown as { __xss?: number }).__xss).toBeUndefined();
+
+    const link = summary.querySelector('a')!;
+    expect(link.textContent).toContain('<img src=x onerror="window.__xss=1">');
+  });
+
+  it('échappe l\'id de question utilisé dans href et data-question-id', () => {
+    // Les ids LimeSurvey sont normalement sains, mais on ne se repose pas
+    // dessus : setAttribute doit empêcher une cassure d'attribut.
+    const q = document.createElement('div');
+    q.id = 'q"><img src=x onerror="window.__xssId=1">';
+    q.className = 'question-container input-error';
+    const label = document.createElement('h3');
+    label.className = 'question-text';
+    label.textContent = 'Libellé';
+    q.appendChild(label);
+    document.getElementById('questions')!.appendChild(q);
+
+    createErrorSummary();
+
+    const summary = document.getElementById('dsfr-error-summary')!;
+    expect(summary.querySelector('img')).toBeNull();
+    expect((window as unknown as { __xssId?: number }).__xssId).toBeUndefined();
   });
 
   it('a les classes DSFR correctes (fr-alert, fr-alert--error)', () => {

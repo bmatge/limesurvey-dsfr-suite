@@ -1,26 +1,5 @@
 import { describe, it, expect } from 'vitest';
-
-// --- Reproduire la logique de extractQuestionCodes depuis custom.js (lines 2525-2543) ---
-
-function extractQuestionCodes(expression: string | null | undefined): string[] {
-  if (!expression) return [];
-
-  const questionCodes: string[] = [];
-
-  // Pattern pour trouver les codes de questions (format : Q + chiffres + optionnel _SQ + chiffres)
-  // Exemples: Q1, Q2_SQ001, Q123, etc.
-  const regex = /\b(Q\d+(?:_SQ\d+)?)\./gi;
-
-  let match;
-  while ((match = regex.exec(expression)) !== null) {
-    const code = match[1];
-    if (!questionCodes.includes(code)) {
-      questionCodes.push(code);
-    }
-  }
-
-  return questionCodes;
-}
+import { extractQuestionCodes } from '../../modules/theme-dsfr/src/a11y/conditional-aria.js';
 
 // --- Tests ---
 

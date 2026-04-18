@@ -1,12 +1,5 @@
 import { describe, it, expect } from 'vitest';
-
-// --- Reproduire la logique de validation numérique de custom.js (line 1516) ---
-
-function isValidNumber(value: string): boolean {
-  return /^-?\d+([.,]\d*)?$/.test(value) || /^-?\d*[.,]\d+$/.test(value);
-}
-
-// --- Tests ---
+import { isValidNumber } from '../../modules/theme-dsfr/src/core/dom-utils.js';
 
 describe('isValidNumber', () => {
   describe('valeurs valides', () => {

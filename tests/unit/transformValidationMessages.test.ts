@@ -1,32 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-
-// --- Reproduire la logique depuis custom.js (lines 2361-2389) ---
-
-function transformValidationMessages(): void {
-  const emMessages = document.querySelectorAll('.ls-question-message');
-  emMessages.forEach((message) => {
-    if (message.classList.contains('fr-message')) return;
-
-    let messageType = 'info';
-    if (message.classList.contains('ls-em-error')) {
-      messageType = 'error';
-    } else if (message.classList.contains('ls-em-warning')) {
-      messageType = 'warning';
-    } else if (
-      message.classList.contains('ls-em-success') ||
-      message.classList.contains('ls-em-tip')
-    ) {
-      messageType = 'info';
-    }
-
-    const dsfrMessage = document.createElement('p');
-    dsfrMessage.className = `fr-message fr-message--${messageType}`;
-    dsfrMessage.textContent = message.textContent!.trim();
-    dsfrMessage.id = message.id ? `${message.id}-dsfr` : '';
-
-    message.replaceWith(dsfrMessage);
-  });
-}
+import { transformValidationMessages } from '../../modules/theme-dsfr/src/validation/validation-messages.js';
 
 // --- Tests ---
 

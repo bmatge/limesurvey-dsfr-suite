@@ -1,44 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-
-// --- Reproduire la logique depuis custom.js (lines 2910-2945) ---
-
-function enableImageLazyLoading(): void {
-  const imageSelectors = [
-    '.answer-item img',
-    '.fr-fieldset__content img',
-    '.answertext img',
-    '.fr-checkbox-group img',
-    '.fr-radio-group img',
-    '.question-text-container img',
-    '.ls-question-text img',
-    '.ls-question-help img',
-  ];
-
-  const images = document.querySelectorAll(imageSelectors.join(', '));
-
-  images.forEach(function (img) {
-    // Ajouter loading="lazy" si pas déjà présent
-    if (!img.hasAttribute('loading')) {
-      img.setAttribute('loading', 'lazy');
-    }
-
-    // Ajouter alt si manquant (accessibilité RGAA)
-    if (!img.hasAttribute('alt') || img.getAttribute('alt')!.trim() === '') {
-      const altText =
-        img.hasAttribute('title') && img.getAttribute('title')!.trim() !== ''
-          ? img.getAttribute('title')!
-          : 'Image de réponse';
-      img.setAttribute('alt', altText);
-    }
-
-    // Optionnel : Ajouter une classe pour styling
-    if (!img.classList.contains('dsfr-enhanced-image')) {
-      img.classList.add('dsfr-enhanced-image');
-    }
-  });
-}
-
-// --- Tests ---
+import { enableImageLazyLoading } from '../../modules/theme-dsfr/src/a11y/lazy-images.js';
 
 describe('enableImageLazyLoading', () => {
   beforeEach(() => {

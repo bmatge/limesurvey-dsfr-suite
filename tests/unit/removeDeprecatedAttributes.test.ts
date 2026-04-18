@@ -1,35 +1,5 @@
 import { describe, it, expect } from 'vitest';
-
-// --- Reproduire la logique depuis custom.js (lines 4049-4059) ---
-
-function shouldSkipElement(element: Element | null): boolean {
-  if (!element) return true;
-  if (
-    element.classList &&
-    (element.classList.contains('required-asterisk') ||
-      element.classList.contains('asterisk'))
-  )
-    return true;
-  if (element.tagName === 'IMG') return true;
-  if (element.querySelector && element.querySelector('img')) return true;
-  if (element.closest && element.closest('[class*="upload"]')) return true;
-  if (element.closest && element.closest('[class*="file"]')) return true;
-  return false;
-}
-
-function removeDeprecatedAttributes(element: Element | null): void {
-  if (!element || element.nodeType !== Node.ELEMENT_NODE) return;
-  if (shouldSkipElement(element)) return;
-
-  // Attributs HTML obsolètes de mise en forme
-  ['align', 'bgcolor', 'color', 'face', 'size'].forEach((attr) => {
-    if (element.hasAttribute(attr)) {
-      element.removeAttribute(attr);
-    }
-  });
-}
-
-// --- Tests ---
+import { removeDeprecatedAttributes } from '../../modules/theme-dsfr/src/rte/sanitize.js';
 
 describe('removeDeprecatedAttributes', () => {
   it('supprime align', () => {

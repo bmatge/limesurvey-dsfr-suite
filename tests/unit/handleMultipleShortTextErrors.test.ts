@@ -1,54 +1,16 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { handleMultipleShortTextErrors } from '../../modules/theme-dsfr/src/validation/mst-errors.js';
 
-// --- Reproduire les effets DOM de handleMultipleShortTextErrors (lines 964-1136) ---
-
-function handleMultipleShortTextErrors(): void {
-  const multipleQuestions = document.querySelectorAll('.question-container.multiple-short-txt');
-
-  multipleQuestions.forEach(function (question) {
-    if (!question.classList.contains('input-error')) return;
-    if ((question as HTMLElement).dataset.mandatoryCounterAttached) return;
-    (question as HTMLElement).dataset.mandatoryCounterAttached = 'true';
-
-    // Cacher les messages legacy
-    question.querySelectorAll(
-      '.ls-question-mandatory, .ls-question-mandatory-initial, .ls-question-mandatory-array'
-    ).forEach((msg) => { (msg as HTMLElement).style.display = 'none'; });
-
-    const validContainer = question.querySelector('.question-valid-container');
-    if (validContainer) (validContainer as HTMLElement).style.display = 'none';
-
-    // Retirer erreurs individuelles
-    question.querySelectorAll('.answer-item:not(.d-none)').forEach((item) => {
-      const inputGroup = item.querySelector('.fr-input-group');
-      const messagesGroup = item.querySelector('.fr-messages-group');
-      if (inputGroup) inputGroup.classList.remove('fr-input-group--error');
-      if (messagesGroup) {
-        const err = messagesGroup.querySelector('.fr-message--error');
-        if (err) err.remove();
-      }
-      item.classList.remove('input-error', 'ls-error-mandatory', 'has-error');
-    });
-
-    // Créer compteur global
-    const counterContainer = document.createElement('div');
-    counterContainer.className = 'fr-messages-group fr-mt-2w';
-    counterContainer.setAttribute('aria-live', 'polite');
-    counterContainer.id = 'mandatory-counter-' + (question.id || 'test');
-
-    const counterMessage = document.createElement('p');
-    counterMessage.className = 'fr-message fr-message--error';
-    counterMessage.setAttribute('role', 'status');
-    counterContainer.appendChild(counterMessage);
-
-    const answersList = question.querySelector('.ls-answers, .subquestion-list');
-    if (answersList && answersList.parentNode) {
-      answersList.parentNode.insertBefore(counterContainer, answersList.nextSibling);
-    } else {
-      question.appendChild(counterContainer);
-    }
-  });
-}
+// Fake timers : handleMultipleShortTextErrors planifie setTimeout(updateErrorSummary, 50)
+// après chaque mutation. On les capture pour que jsdom ne soit pas déjà torn-down
+// au moment où ils firent.
+beforeEach(() => {
+  vi.useFakeTimers();
+});
+afterEach(() => {
+  vi.clearAllTimers();
+  vi.useRealTimers();
+});
 
 // --- Helpers ---
 

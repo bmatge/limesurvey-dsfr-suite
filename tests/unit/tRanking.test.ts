@@ -1,42 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-
-// --- Reproduire la logique de tRanking depuis custom.js (lines 3020-3058) ---
-
-const RANKING_I18N_FR: Record<string, string> = {
-  ranking_actions_for: 'Actions pour %s',
-  ranking_add: 'Ajouter au classement',
-  ranking_add_aria: 'Ajouter %s au classement',
-  ranking_up: 'Monter',
-  ranking_up_aria: 'Monter %s',
-  ranking_down: 'Descendre',
-  ranking_down_aria: 'Descendre %s',
-  ranking_remove: 'Retirer',
-  ranking_remove_aria: 'Retirer %s du classement',
-};
-
-const RANKING_I18N_EN: Record<string, string> = {
-  ranking_actions_for: 'Actions for %s',
-  ranking_add: 'Add to ranking',
-  ranking_add_aria: 'Add %s to ranking',
-  ranking_up: 'Move up',
-  ranking_up_aria: 'Move %s up',
-  ranking_down: 'Move down',
-  ranking_down_aria: 'Move %s down',
-  ranking_remove: 'Remove',
-  ranking_remove_aria: 'Remove %s from ranking',
-};
-
-function tRanking(key: string, label?: string): string {
-  const lang = (document.documentElement.lang || 'fr').toLowerCase().substring(0, 2);
-  const dict = lang === 'en' ? RANKING_I18N_EN : RANKING_I18N_FR;
-  let str = dict[key] || RANKING_I18N_FR[key] || key;
-  if (typeof label !== 'undefined') {
-    str = str.replace('%s', label);
-  }
-  return str;
-}
-
-// --- Tests ---
+import { tRanking } from '../../modules/theme-dsfr/src/core/i18n.js';
 
 describe('tRanking', () => {
   beforeEach(() => {
