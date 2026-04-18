@@ -49,16 +49,16 @@ describe('createErrorSummary', () => {
     expect(summary.getAttribute('tabindex')).toBe('-1');
   });
 
-  it('affiche "Une erreur a été détectée" pour 1 erreur', () => {
+  it('affiche "Une erreur à corriger" pour 1 erreur', () => {
     addErrorQuestion('question1', 'Votre nom', 'Obligatoire');
 
     createErrorSummary();
 
     const title = document.querySelector('.fr-alert__title')!;
-    expect(title.textContent).toBe('Une erreur a été détectée');
+    expect(title.textContent).toBe('Une erreur à corriger');
   });
 
-  it('affiche "N erreurs ont été détectées" pour plusieurs erreurs', () => {
+  it('affiche "N erreurs à corriger" pour plusieurs erreurs', () => {
     addErrorQuestion('question1', 'Nom', 'Obligatoire');
     addErrorQuestion('question2', 'Prénom', 'Obligatoire');
     addErrorQuestion('question3', 'Email', 'Format invalide');
@@ -66,7 +66,7 @@ describe('createErrorSummary', () => {
     createErrorSummary();
 
     const title = document.querySelector('.fr-alert__title')!;
-    expect(title.textContent).toBe('3 erreurs ont été détectées');
+    expect(title.textContent).toBe('3 erreurs à corriger');
   });
 
   it('crée un lien par question en erreur avec href="#questionId"', () => {
@@ -113,14 +113,17 @@ describe('createErrorSummary', () => {
     expect(link.textContent!.endsWith('...')).toBe(true);
   });
 
-  it('est inséré avant la première question', () => {
+  it('est inséré avant la première question (avec la région status juste après)', () => {
     addErrorQuestion('question1', 'Q1', 'Erreur');
 
     createErrorSummary();
 
     const summary = document.getElementById('dsfr-error-summary')!;
+    const status = document.getElementById('dsfr-error-status')!;
     const firstQuestion = document.querySelector('.question-container')!;
-    expect(summary.nextElementSibling).toBe(firstQuestion);
+    // Le résumé précède la région status, qui précède la 1re question.
+    expect(summary.nextElementSibling).toBe(status);
+    expect(status.nextElementSibling).toBe(firstQuestion);
   });
 
   it('remplace l\'ancien résumé s\'il existe', () => {

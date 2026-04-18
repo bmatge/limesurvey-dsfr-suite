@@ -162,28 +162,34 @@ test.describe('Validation — champs obligatoires et erreurs DSFR', () => {
       await expect(question60).not.toHaveClass(/input-error/, { timeout: 5_000 });
     });
 
-    test('le résumé des erreurs se met à jour après correction', async ({ page }) => {
+    test('le résumé des erreurs se met à jour après correction (retrait d\'item)', async ({ page }) => {
       await goToMandatoryPage(page);
       await submitEmpty(page);
 
       await expect(page.locator(S.errorSummary)).toBeVisible({ timeout: 10_000 });
 
-      // Count non-corrected error items
-      const uncorrectedSelector = '#dsfr-error-summary .error-item:not(.corrected)';
-      const initialCount = await page.locator(uncorrectedSelector).count();
+      // Comportement : les items corrigés sont RETIRÉS de la liste
+      // (RGAA 11.10 + annonce via région role="status" aria-live).
+      const itemsSelector = '#dsfr-error-summary .error-item';
+      const initialCount = await page.locator(itemsSelector).count();
       expect(initialCount).toBeGreaterThan(0);
 
-      // Fill question 60 (SCopy) — simple short text
+      // Remplir question 60 (SCopy) — texte court obligatoire
       const input = page.locator('#question60 input[type="text"]');
       await input.fill('Test validation');
       await input.dispatchEvent('change');
       await input.blur();
 
-      // The error summary should show fewer uncorrected items and update its title
+      // Moins d'items dans la liste après correction
       await expect(async () => {
-        const updatedCount = await page.locator(uncorrectedSelector).count();
+        const updatedCount = await page.locator(itemsSelector).count();
         expect(updatedCount).toBeLessThan(initialCount);
       }).toPass({ timeout: 5_000 });
+
+      // La région status sr-only doit annoncer la correction
+      const status = page.locator('#dsfr-error-status');
+      await expect(status).toHaveAttribute('role', 'status');
+      await expect(status).toHaveAttribute('aria-live', 'polite');
     });
   });
 
