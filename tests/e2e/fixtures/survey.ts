@@ -27,61 +27,101 @@ const NEXT_BTN = '#ls-button-submit[value="movenext"]';
 const FINAL_SUBMIT_BTN = '#ls-button-submit[value="movesubmit"]';
 
 /**
+ * Version rapide : remplit la majeure partie des champs via un unique
+ * `page.evaluate`, pour éviter des dizaines de round-trips CDP par page.
+ * Les rankings et l'input-on-demand (qui ont une lib JS qui intercepte le
+ * clic « Ajouter ») doivent encore passer par de vrais clics Playwright —
+ * traités après ce bloc.
+ */
+async function fillMandatoryFieldsFast(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    // Text inputs + textarea dans .mandatory.question-container
+    document.querySelectorAll('.mandatory.question-container input[type="text"], .mandatory.question-container textarea').forEach((el) => {
+      const input = el as HTMLInputElement | HTMLTextAreaElement;
+      if (input.disabled) return;
+      if (input.value) return;
+      const isNumeric = (input as HTMLInputElement).dataset?.number === '1' || input.getAttribute('inputmode') === 'numeric';
+      input.value = isNumeric ? '42' : 'Test';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    // Cocher 1 radio par question mandatory
+    document.querySelectorAll('.mandatory.question-container').forEach((q) => {
+      const radios = Array.from(q.querySelectorAll('input[type="radio"]:not([disabled])')) as HTMLInputElement[];
+      if (radios.length === 0) return;
+      if (radios.some((r) => r.checked)) return;
+      const first = radios[0];
+      first.checked = true;
+      first.dispatchEvent(new Event('click', { bubbles: true }));
+      first.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    // Cocher 1 checkbox par question mandatory
+    document.querySelectorAll('.mandatory.question-container').forEach((q) => {
+      const cbs = Array.from(q.querySelectorAll('input[type="checkbox"]:not([disabled])')) as HTMLInputElement[];
+      if (cbs.length === 0) return;
+      if (cbs.some((c) => c.checked)) return;
+      const first = cbs[0];
+      first.checked = true;
+      first.dispatchEvent(new Event('click', { bubbles: true }));
+      first.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+  });
+}
+
+/**
  * Remplit les champs obligatoires visibles sur la page courante
  * pour permettre la navigation vers la page suivante.
  */
 export async function fillMandatoryFields(page: Page): Promise<void> {
-  // Inputs texte (détecter les champs numériques via data-number="1")
-  const mandatoryInputs = page.locator('.mandatory.question-container input[type="text"]:visible');
-  const inputCount = await mandatoryInputs.count();
-  for (let i = 0; i < inputCount; i++) {
-    const val = await mandatoryInputs.nth(i).inputValue();
-    if (!val) {
-      const isNumeric = await mandatoryInputs.nth(i).getAttribute('data-number');
-      await mandatoryInputs.nth(i).fill(isNumeric === '1' ? '42' : 'Test');
-    }
-  }
-  // Textareas
-  const mandatoryTextareas = page.locator('.mandatory.question-container textarea:visible');
-  const taCount = await mandatoryTextareas.count();
-  for (let i = 0; i < taCount; i++) {
-    const val = await mandatoryTextareas.nth(i).inputValue();
-    if (!val) await mandatoryTextareas.nth(i).fill('Test');
-  }
-  // Radios : cocher la première option si rien n'est sélectionné
-  const mandatoryContainers = page.locator('.mandatory.question-container');
-  const mcRadioCount = await mandatoryContainers.count();
-  for (let i = 0; i < mcRadioCount; i++) {
-    const container = mandatoryContainers.nth(i);
-    const radios = container.locator('input[type="radio"]:visible');
-    if (await radios.count() > 0 && await container.locator('input[type="radio"]:checked').count() === 0) {
-      await radios.first().check({ force: true });
-    }
-  }
-  // Ranking : ajouter au moins un élément si la question est vide
-  const rankingQuestions = page.locator('.mandatory.question-container .ranking-btn-add');
-  const rankBtnCount = await rankingQuestions.count();
-  if (rankBtnCount > 0) {
-    const firstBtn = rankingQuestions.first();
-    if (await firstBtn.isVisible().catch(() => false)) {
-      await firstBtn.click();
-      await page.waitForTimeout(100);
+  // Phase 1 : remplissage rapide en JS (inputs/textarea/radios/checkboxes)
+  // en un unique round-trip CDP — sinon, sur une page à 24+ champs, chaque
+  // opération Playwright ajoute 50–100 ms et on dépasse le timeout de test.
+  await fillMandatoryFieldsFast(page);
+
+  // Phase 2 : rankings (lib JS qui intercepte le clic « Ajouter »).
+  // Les questions ranking ont souvent une contrainte `min_answers` imposée
+  // par EM (validation serveur), indépendamment de mandatory=Y/N.
+  const rankingContainers = page.locator('.ranking-question-dsfr');
+  const rkCount = await rankingContainers.count();
+  for (let i = 0; i < rkCount; i++) {
+    const rc = rankingContainers.nth(i);
+    for (let safety = 0; safety < 10; safety++) {
+      const addBtn = rc.locator('.ranking-btn-add').first();
+      if (!(await addBtn.isVisible().catch(() => false))) break;
+      await addBtn.click({ force: true }).catch(() => {});
+      await page.waitForTimeout(30);
     }
   }
 
-  // Checkboxes : cocher la première option si rien n'est sélectionné
-  const mandatoryCbContainers = page.locator('.mandatory.question-container');
-  const mcCount = await mandatoryCbContainers.count();
-  for (let i = 0; i < mcCount; i++) {
-    const container = mandatoryCbContainers.nth(i);
-    const checkboxes = container.locator('input[type="checkbox"]:visible');
-    const cbTotal = await checkboxes.count();
-    if (cbTotal === 0) continue;
-    const checkedCount = await container.locator('input[type="checkbox"]:checked').count();
-    if (checkedCount === 0) {
-      // Le label DSFR recouvre l'input, utiliser force pour cocher directement
-      await checkboxes.first().check({ force: true });
+  // Phase 3 : inputondemand (nécessite un vrai clic « Ajouter une ligne »
+  // pour déclencher la lib LS qui enlève `d-none` sur la sous-question suivante).
+  // LimeSurvey valide côté serveur TOUTES les sous-questions y compris les
+  // non-encore-révélées — on les affiche toutes puis on remplit.
+  const iodContainers = page.locator('.mandatory.question-container [id^="selector--inputondemand-"]');
+  const iodCount = await iodContainers.count();
+  for (let i = 0; i < iodCount; i++) {
+    const ctn = iodContainers.nth(i);
+    const addBtn = ctn.locator('.selector--inputondemand-addlinebutton');
+    for (let safety = 0; safety < 10; safety++) {
+      const hidden = await ctn.locator('.selector--inputondemand-list-item.d-none').count();
+      if (hidden === 0) break;
+      if (!(await addBtn.isVisible().catch(() => false))) break;
+      await addBtn.click({ force: true }).catch(() => {});
+      await page.waitForTimeout(30);
     }
+    // Remplir les inputs via JS (plus rapide et gère aussi les éléments
+    // visuellement cachés par un parent en display:none résiduel).
+    await page.evaluate((containerId) => {
+      const ctr = document.getElementById(containerId);
+      if (!ctr) return;
+      ctr.querySelectorAll('input[type="text"], textarea').forEach((el) => {
+        const input = el as HTMLInputElement | HTMLTextAreaElement;
+        if (input.disabled || input.value) return;
+        input.value = 'Test';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+    }, await ctn.getAttribute('id') || '');
   }
 }
 
@@ -111,6 +151,10 @@ export async function navigateToSelector(page: Page, selector: string, maxPages 
     if (await nextBtn.isVisible().catch(() => false)) {
       await nextBtn.click();
       await page.waitForLoadState('domcontentloaded');
+      // Petit délai pour laisser le core LimeSurvey + notre JS DSFR initialiser
+      // la page fraîchement rendue (handlers, relevance, error-summary, etc.)
+      // avant le prochain remplissage / contrôle de visibilité.
+      await page.waitForTimeout(250);
     } else {
       throw new Error(`Selector "${selector}" not found after ${i + 1} pages and no Next button available`);
     }

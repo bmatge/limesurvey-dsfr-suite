@@ -1,14 +1,14 @@
-import { test, expect, SURVEY_URL, advancePages } from './fixtures/survey';
+import { test, expect, SURVEY_URL, navigateToSelector } from './fixtures/survey';
 import { S } from './helpers/selectors';
 
 /**
- * Helper: navigate to page 5 (gid=4, "Questions à réponses multiples")
- * where ranking questions R (qid=25) and R1 (qid=39) live.
+ * Helper: navigate to the page containing ranking questions R (qid=25)
+ * and R1 (qid=39). Robuste au réordonnancement du questionnaire.
  */
 async function goToRankingPage(page: import('@playwright/test').Page) {
   await page.goto(SURVEY_URL);
   await page.waitForLoadState('domcontentloaded');
-  await advancePages(page, 5);
+  await navigateToSelector(page, S.rankingQuestion);
   // Wait for the ranking JS to initialize (setTimeout 200ms in custom.js)
   await page.waitForSelector(S.rankingQuestion, { timeout: 10_000 });
 }

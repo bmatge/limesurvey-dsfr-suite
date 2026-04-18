@@ -1,14 +1,16 @@
-import { test, expect, SURVEY_URL, advancePages } from './fixtures/survey';
+import { test, expect, SURVEY_URL, navigateToSelector } from './fixtures/survey';
 import { S } from './helpers/selectors';
 
 /**
- * Navigate to page 6 (gid=5, "Conditions et scenarios").
- * From the survey start: welcome page + 5 group pages = 6 clicks on "Suivant".
+ * Navigate to the "Conditions et scenarios" page (gid=5).
+ * Identifiée par la présence de #question42 (QC, type Oui/Non).
+ * Robuste au réordonnancement : utilise navigateToSelector plutôt
+ * qu'un nombre fixe de clics "Suivant".
  */
 async function goToConditionalPage(page: import('@playwright/test').Page): Promise<void> {
   await page.goto(SURVEY_URL);
   await page.waitForLoadState('domcontentloaded');
-  await advancePages(page, 6);
+  await navigateToSelector(page, '#question42');
 }
 
 /** Locator for question container by qid. */
@@ -16,7 +18,7 @@ function questionLocator(page: import('@playwright/test').Page, qid: number) {
   return page.locator(`#question${qid}`);
 }
 
-test.describe('Conditions et scenarios — questions conditionnelles (page 6)', () => {
+test.describe('Conditions et scenarios — questions conditionnelles', () => {
 
   test.describe('Etat initial — visibilite par defaut', () => {
 

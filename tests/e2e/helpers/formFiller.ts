@@ -261,7 +261,33 @@ export async function snapshotFormState(page: Page): Promise<FilledValues> {
 
 /* ───────────────────────── Orchestration ─────────────────────────────── */
 
+/**
+ * "Question à la demande" (inputondemand) : LimeSurvey cache les
+ * sous-questions au-delà de la 1ère (classe `d-none`). Il faut cliquer
+ * "Ajouter une ligne" pour révéler les suivantes. Le round-trip DB exige
+ * que toutes les sous-questions déclarées soient soumises, donc on révèle
+ * tout avant de laisser fillTextInputs remplir les champs.
+ */
+async function revealAllInputOnDemandLines(page: Page): Promise<void> {
+  const containers = page.locator('[id^="selector--inputondemand-"]');
+  const n = await containers.count();
+  for (let i = 0; i < n; i++) {
+    const ctn = containers.nth(i);
+    const addBtn = ctn.locator('.selector--inputondemand-addlinebutton');
+    for (let safety = 0; safety < 10; safety++) {
+      const hidden = await ctn.locator('.selector--inputondemand-list-item.d-none').count();
+      if (hidden === 0) break;
+      if (!(await addBtn.isVisible().catch(() => false))) break;
+      await addBtn.click({ force: true }).catch(() => {});
+      await page.waitForTimeout(30);
+    }
+  }
+}
+
 async function fillOnePass(page: Page, variant: Variant): Promise<void> {
+  // Révéler toutes les sous-questions inputondemand AVANT de remplir
+  // les inputs texte (sinon ils sont `offsetParent === null` et ignorés).
+  await revealAllInputOnDemandLines(page);
   await fillTextInputs(page, variant);
   await fillNumericInputs(page, variant);
   await fillDateSelects(page, variant);

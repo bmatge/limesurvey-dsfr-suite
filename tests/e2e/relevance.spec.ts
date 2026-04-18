@@ -1,4 +1,4 @@
-import { test, expect, SURVEY_URL, advancePages } from './fixtures/survey';
+import { test, expect, SURVEY_URL, navigateToSelector } from './fixtures/survey';
 import { S } from './helpers/selectors';
 import type { Page } from '@playwright/test';
 
@@ -8,19 +8,20 @@ import type { Page } from '@playwright/test';
  * - triggerEmRelevanceSubQuestion (visibilité de sous-questions dans les tableaux)
  * - updateLineClass (recalcul des classes pair/impair après masquage)
  *
- * Ces tests utilisent la page 6 (conditions) et la page 4 (tableaux).
+ * Navigation robuste : sélecteurs stables (qid) plutôt que numéros de
+ * page, pour survivre au réordonnancement du questionnaire.
  */
 
 async function goToConditionalPage(page: Page): Promise<void> {
   await page.goto(SURVEY_URL);
   await page.waitForLoadState('domcontentloaded');
-  await advancePages(page, 6);
+  await navigateToSelector(page, '#question42');
 }
 
 async function goToArrayPage(page: Page): Promise<void> {
   await page.goto(SURVEY_URL);
   await page.waitForLoadState('domcontentloaded');
-  await advancePages(page, 4);
+  await navigateToSelector(page, '#question26');
 }
 
 function questionLocator(page: Page, qid: number) {
